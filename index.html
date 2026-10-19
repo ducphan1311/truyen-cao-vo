@@ -49,6 +49,21 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* CẤM CHỌN CHỮ VÀ BÔI ĐEN TOÀN DIỆN */
+    body, html, * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+
+    /* VÔ HIỆU HÓA IN ẤN */
+    @media print {
+      body { display: none !important; }
+    }
+
     body {
       font-family: 'Merriweather', Georgia, serif;
       background: var(--bg);
@@ -115,6 +130,8 @@
       font-size: 14px;
       font-family: 'Nunito', sans-serif;
       outline: none;
+      -webkit-user-select: text !important;
+      user-select: text !important;
     }
 
     .chapter-list {
@@ -246,6 +263,7 @@
       margin-bottom: 1.6em;
       text-align: justify;
       text-indent: 1.8em;
+      position: relative;
     }
     .novel-body p:first-of-type { text-indent: 0; }
     .novel-body p:first-of-type::first-letter {
@@ -257,7 +275,7 @@
       color: var(--gold);
     }
 
-    /* Paywall Blur Protection */
+    /* Paywall Protection */
     .paywall-overlay {
       position: relative;
       margin-top: 20px;
@@ -332,6 +350,8 @@
       font-family: 'Nunito', sans-serif;
       font-size: 14.5px;
       outline: none;
+      -webkit-user-select: text !important;
+      user-select: text !important;
     }
     .form-input:focus { border-color: var(--accent); }
     .form-btn-submit {
@@ -405,6 +425,28 @@
     }
     .nav-btn:hover:not(:disabled) { background: var(--accent); color: #000; border-color: var(--accent); }
     .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Security Toast Notification */
+    #security-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(239, 68, 68, 0.95);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 9999;
+      transform: translateY(150%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #security-toast.show { transform: translateY(0); }
   </style>
 </head>
 <body>
@@ -448,14 +490,14 @@
       <div class="chapter-hero">
         <div class="badge-universe">Tinh Vũ Kỷ Nguyên • Cao Võ Tinh Không</div>
         <h1 class="chapter-title" id="display-title">Đang tải chương...</h1>
-        <div class="chapter-meta" id="display-meta">Nhân vật chính: Diệp Nhiên • Biên dịch hoàn chỉnh tiếng Việt</div>
+        <div class="chapter-meta" id="display-meta">Nhân vật chính: Diệp Nhiên • Bản dịch độc quyền bảo mật</div>
       </div>
 
       <div class="novel-body" id="display-body"></div>
 
       <!-- Paywall Card (Shows when not authenticated & chapter > 1053) -->
       <div class="paywall-overlay" id="paywall-card" style="display:none;">
-        <h2 class="paywall-title">🔒 Nội Dung Dành Cho Độc Giả</h2>
+        <h2 class="paywall-title">🔒 Nội Dung Dành Cho Độc GiẢ</h2>
         <p class="paywall-desc">Bạn đang đọc thử miễn phí Chương 1053. Để tiếp tục thưởng thức trọn vẹn bản dịch trau chuốt các chương tiếp theo, vui lòng đăng ký tài khoản.</p>
         <div style="display:flex;gap:12px;">
           <button class="btn-action btn-primary" onclick="openRegisterModal()" style="padding:10px 20px;">Đăng Ký Mở Khóa</button>
@@ -547,6 +589,12 @@
     </div>
   </div>
 
+  <!-- Security Toast -->
+  <div id="security-toast">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="security-msg">Bản dịch được bảo vệ bản quyền. Nghiêm cấm sao chép!</span>
+  </div>
+
   <script>
     // Supabase Configuration
     const SUPABASE_URL = "https://ujylxmkhychrcvzrlbqx.supabase.co";
@@ -576,6 +624,88 @@
     const btnOpenRegister = document.getElementById('btn-open-register');
     const btnOpenLogin = document.getElementById('btn-open-login');
     const btnLogout = document.getElementById('btn-logout');
+    const securityToast = document.getElementById('security-toast');
+
+    function showSecurityToast(msg) {
+      document.getElementById('security-msg').textContent = msg || 'Bản quyền nội dung thuộc về tác quyền. Nghiêm cấm sao chép!';
+      securityToast.classList.add('show');
+      setTimeout(() => securityToast.classList.remove('show'), 2500);
+    }
+
+    // ==========================================
+    // 🛡️ ANTI-COPY & ANTI-SCRAPE SECURITY LAYER
+    // ==========================================
+
+    // 1. Chặn chuột phải (Context Menu)
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showSecurityToast('Chuột phải đã bị vô hiệu hóa để bảo vệ bản quyền tác phẩm!');
+      return false;
+    });
+
+    // 2. Chặn các phím tắt copy, select all, print, save web, view source, devtools
+    document.addEventListener('keydown', (e) => {
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
+      // Ctrl/Cmd + C, A, X, S, P, U
+      if (isCmdOrCtrl && ['c', 'a', 'x', 's', 'p', 'u'].includes(key)) {
+        e.preventDefault();
+        e.stopPropagation();
+        showSecurityToast('Thao tác sao chép / in ấn / lưu trữ bị vô hiệu hóa!');
+        return false;
+      }
+
+      // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Inspect / DevTools)
+      if (e.keyCode === 123 || (isCmdOrCtrl && e.shiftKey && ['i', 'j', 'c'].includes(key))) {
+        e.preventDefault();
+        e.stopPropagation();
+        showSecurityToast('Truy cập công cụ nhà phát triển đã bị chặn!');
+        return false;
+      }
+    }, true);
+
+    // 3. Ghi đè Clipboard nếu cố tình copy qua bất kỳ cơ chế nào
+    document.addEventListener('copy', (e) => {
+      const userTag = currentUser ? (' [Reader: ' + currentUser.email + ']') : '';
+      const notice = 'Tác phẩm dịch độc quyền: Cao Võ: Từ Giết Gà Bắt Đầu Quét Ngang Tinh Không' + userTag + '. Nghiêm cấm mọi hành vi sao chép, trích xuất và phân phối lại trái phép!';
+      if (e.clipboardData) {
+        e.clipboardData.setData('text/plain', notice);
+      } else if (window.clipboardData) {
+        window.clipboardData.setData('Text', notice);
+      }
+      e.preventDefault();
+      showSecurityToast('Nội dung đã được mã hóa bản quyền!');
+    });
+
+    // 4. Debugger Trap (Bẫy Console khựng lại ngay khi cố tình mở DevTools)
+    (function antiDevTools() {
+      function trap() {
+        (function() {
+          return false;
+        }["constructor"]("debugger")());
+      }
+      setInterval(trap, 350);
+    })();
+
+    // 5. Thủy ấn vô hình (Zero-Width Steganography) nhúng Email độc giả
+    function injectInvisibleWatermark(paragraph, userIdentifier) {
+      if (!userIdentifier) return paragraph;
+      try {
+        const binary = Array.from(new TextEncoder().encode(userIdentifier))
+          .map(b => b.toString(2).padStart(8, '0'))
+          .join('');
+        // Map 0 -> ​ (ZWSP), 1 -> ‌ (ZWNJ), delimiter -> ‍ (ZWJ)
+        const zwTag = '‍' + Array.from(binary).map(b => b === '1' ? '‌' : '​').join('') + '‍';
+        const spaceIdx = paragraph.indexOf(' ');
+        if (spaceIdx !== -1) {
+          return paragraph.slice(0, spaceIdx) + zwTag + paragraph.slice(spaceIdx);
+        }
+      } catch (err) {
+        console.error("Watermark injection err:", err);
+      }
+      return paragraph;
+    }
 
     // === ACCOUNT SHARING SECURITY CHECK ===
     async function enforceSingleActiveSession() {
@@ -593,7 +723,6 @@
         console.error("Session check error:", err);
       }
     }
-    // Check session every 15 seconds
     setInterval(enforceSingleActiveSession, 15000);
 
     // Render Chapters List
@@ -634,8 +763,14 @@
         // Authenticated or Free
         paywallCard.style.display = 'none';
         const paragraphs = c.content.split(/\n\n+/).filter(p => p.trim().length > 0);
-        displayBody.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
-        // Trigger session verification on chapter navigation
+        
+        // Render paragraphs with invisible watermark
+        const readerEmail = currentUser ? currentUser.email : 'public_trial';
+        displayBody.innerHTML = paragraphs.map(p => {
+          const secureParagraph = injectInvisibleWatermark(p.trim(), readerEmail);
+          return `<p>${secureParagraph}</p>`;
+        }).join('');
+
         if (isAuthenticated) enforceSingleActiveSession();
       }
 
@@ -667,7 +802,6 @@
       btn.disabled = true;
 
       try {
-        // Insert registration request into Supabase
         const paymentCode = 'CV' + Math.floor(100000 + Math.random() * 900000);
         const { data, error } = await supabaseClient
           .from('registration_requests')
@@ -678,7 +812,6 @@
         document.getElementById('register-step-1').style.display = 'none';
         document.getElementById('register-step-2').style.display = 'block';
         document.getElementById('qr-memo').textContent = paymentCode;
-        // VietQR quick chart
         const qrUrl = `https://img.vietqr.io/image/970422-0988888888-compact2.png?amount=100000&addInfo=${paymentCode}&accountName=TRUYEN%20CAO%20VO`;
         document.getElementById('qr-code-img').src = qrUrl;
       } catch (err) {
@@ -819,6 +952,14 @@
     document.getElementById('toggle-sidebar').onclick = () => sidebar.classList.toggle('open');
     btnPrev.onclick = () => loadChapter(currentIndex - 1);
     btnNext.onclick = () => loadChapter(currentIndex + 1);
+
+    // Search
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = CHAPTERS.map((c, i) => ({ ...c, originalIndex: i }))
+        .filter(c => c.title.toLowerCase().includes(q) || c.num.toString().includes(q));
+      renderChapterList(filtered);
+    });
 
     // Init
     (async () => {
