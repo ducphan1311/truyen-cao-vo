@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cao Võ: Từ Giết Gà Bắt Đầu Quét Ngang Tinh Không</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f111a;
+      --card-bg: #161926;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --border: #23293e;
+      --gold: #f59e0b;
+      --sidebar-w: 320px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.15);
+      --border: #e2e8f0;
+      --gold: #d97706;
+    }
+
+    [data-theme="sepia"] {
+      --bg: #f4ecd8;
+      --card-bg: #eadeb8;
+      --text: #433422;
+      --text-muted: #79664f;
+      --accent: #9a3412;
+      --accent-glow: rgba(154, 52, 18, 0.15);
+      --border: #d7c9a6;
+      --gold: #b45309;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Merriweather', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.85;
+      font-size: 18px;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @media (max-width: 900px) {
+      #sidebar {
+        transform: translateX(-100%);
+      }
+      #sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      }
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .novel-title {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.3;
+      letter-spacing: 0.5px;
+    }
+
+    .chapter-search {
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'Nunito', sans-serif;
+      outline: none;
+    }
+    .chapter-search:focus {
+      border-color: var(--accent);
+    }
+
+    .chapter-list {
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+      padding: 10px 0;
+    }
+
+    .chapter-item {
+      padding: 12px 20px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .chapter-item:hover {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    .chapter-item.active {
+      border-left-color: var(--accent);
+      background: var(--accent-glow);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .chap-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main Content Area */
+    #main-wrapper {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    @media (max-width: 900px) {
+      #main-wrapper {
+        margin-left: 0;
+      }
+    }
+
+    /* Top Control Bar */
+    header.top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+    }
+
+    .left-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-toggle-menu {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-selector {
+      display: flex;
+      gap: 6px;
+      background: var(--bg);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .theme-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .theme-btn.active {
+      background: var(--card-bg);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .font-controls {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .font-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    /* Reader Container */
+    #reader-container {
+      max-width: 840px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    .chapter-hero {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .badge-universe {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-radius: 20px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    h1.chapter-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .chapter-meta {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Paragraph Styling */
+    .novel-body p {
+      margin-bottom: 1.5em;
+      text-align: justify;
+      text-indent: 1.8em;
+    }
+
+    .novel-body p:first-of-type {
+      text-indent: 0;
+    }
+    .novel-body p:first-of-type::first-letter {
+      font-family: 'Cinzel', serif;
+      font-size: 3.2em;
+      float: left;
+      line-height: 0.8;
+      padding-right: 10px;
+      color: var(--gold);
+    }
+
+    /* Navigation Footer */
+    .chapter-nav-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      text-align: center;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <div class="novel-title">CAO VÕ: TỪ GIẾT GÀ BẮT ĐẦU QUÉT NGANG TINH KHÔNG</div>
+      <input type="text" id="search-input" class="chapter-search" placeholder="Tìm kiếm chương...">
+    </div>
+    <ul class="chapter-list" id="chapter-list">
+      <!-- Chapter Items injected by JS -->
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <div id="main-wrapper">
+    <header class="top-bar">
+      <div class="left-controls">
+        <button class="btn-toggle-menu" id="toggle-sidebar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          Mục lục
+        </button>
+        <div class="theme-selector">
+          <button class="theme-btn active" data-set-theme="dark">Tối</button>
+          <button class="theme-btn" data-set-theme="sepia">Vàng</button>
+          <button class="theme-btn" data-set-theme="light">Sáng</button>
+        </div>
+      </div>
+
+      <div class="font-controls">
+        <button class="font-btn" id="font-dec">A-</button>
+        <button class="font-btn" id="font-inc">A+</button>
+      </div>
+    </header>
+
+    <main id="reader-container">
+      <div class="chapter-hero">
+        <div class="badge-universe">Tinh Vũ Kỷ Nguyên • Cao Võ Tinh Không</div>
+        <h1 class="chapter-title" id="display-title">Đang tải chương...</h1>
+        <div class="chapter-meta" id="display-meta">Nhân vật chính: Diệp Nhiên • Bản dịch hoàn chỉnh</div>
+      </div>
+
+      <div class="novel-body" id="display-body">
+        <!-- Content will be rendered here -->
+      </div>
+
+      <div class="chapter-nav-footer">
+        <button class="nav-btn" id="btn-prev">← Chương trước</button>
+        <button class="nav-btn" id="btn-next">Chương sau →</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const CHAPTERS = [{"num":1053,"id":"7622785","rawTitle":"quá trăm triệu tinh lực","title":"QUÁ TRĂM TRIỆU TINH LỰC","content":"Diệp Nhiên khoanh chân ngay tại chỗ, cảm giác thực lực bây giờ của mình, trên người Khí Vận Chi Linh, cũng đã sử dụng. \n\n Trên tấm bia đá  bốn cái lỗ nhỏ, có thể hấp thu bốn loại khác biệt  vô chủ năng lượng. \n\n Hắn vốn là cũng muốn dùng tại tinh lực năng lượng bên trên. \n\n Nhưng thời gian chỉ vẻn vẹn có một năm, mà một đạo không trọn vẹn màu tím Khí Vận Chi Linh, lúc sử dụng công hiệu rất lâu, chừng hơn nửa năm, hai đạo đều dùng nhất định sẽ lãng phí. \n\n Đến nỗi giữ lại, tiến này bên trong cần chín trăm triệu Cổ Chiến Trường điểm tích lũy, lại đi vào cũng không biết lúc nào. \n\n Dứt khoát tiêu hao một đạo khác màu tím Khí Vận Chi Linh hấp thu Tinh Văn Thiết năng lượng. \n\n Không thể không nói, hiệu quả khác thường kinh người. \n\n Tại hắn tiêu hao trên thân nguyên bản  Tinh Văn Thiết, đột phá tầng hai mươi mốt về sau, lại nhất cổ tác khí, giúp hắn đột phá tầng hai mươi hai. \n\n \"Tầng hai mươi hai Tinh Nguyên Thân, hai mươi triệu cơ sở tinh lực, trung cấp Tinh Quan 12 triệu...\" \n\n Diệp Nhiên trong lòng nhanh chóng tính toán, bởi vì Lục Tinh Khiếu  nguyên nhân, vẻn vẹn trung cấp Tinh Quan, hắn  tinh lực đều có thể so với phổ thông Tinh Vương. \n\n Mà đi qua 187%  tinh lực tăng phúc về sau, đã đạt đến hơn 91 triệu. \n\n Tăng thêm bảy trăm vạn lực Linh Binh, cùng chín trăm ngàn  Ma Cốt Thân. \n\n Bỗng nhiên, đã đạt đến hơn 99 triệu, khoảng cách một trăm triệu tinh lực, gần trong gang tấc! \n\n \"Cường đại, cường đại trước nay chưa từng có!\" \n\n Diệp Nhiên bỗng nhiên nắm chặt nắm đấm, nhịn không được trong lòng cảm khái, thậm chí có loại cảm giác, mình bây giờ đứng tại một năm trước  trước mặt mình, đứng bất động. \n\n Lúc kia hơn hai mươi đoạn  tự mình đều không phá được phòng! \n\n Tầng hai mươi hai  Tinh Nguyên Thân, cứ việc vẫn là nhất trọng Tinh Nguyên Thân, chỉ có thể tăng trưởng bốn lần sức khôi phục. \n\n Nhưng thể chất chênh lệch có thể nói là khác nhau một trời một vực. \n\n Cứng rắn đến đáng sợ! \n\n Này loại đẳng cấp Tinh Nguyên Thân, thậm chí bên ngoài đó chút cường tộc Chân Vương, cũng không có bao nhiêu có thể đạt đến. \n\n Cường tộc Chân Vương bởi vì nhiều sao khiếu  nguyên nhân, muốn nắm giữ hai ức tinh lực, tiến vào thật Vương Tiêu chuẩn, muốn nhẹ nhõm rất nhiều. \n\n Phổ thông chủng tộc  Tinh Vương, nhiều sao khiếu hiếm thấy, cơ bản chỉ có thể đột phá cấp năm ý niệm không gian. \n\n Thông qua thăng cấp Tinh Nguyên Thân mới có thể đạt đến hai ức tinh lực. \n\n \"Hô...\" \n\n Diệp Nhiên thở dài ra một hơi, lần này nhờ có cầm tới tinh cốt cùng số mệnh chi linh, không có hai thứ này, muốn đột phá trung cấp Tinh Quan rất khó, cho ăn bể bụng đột phá Tinh Quan. \n\n Hắn đột phá đại tinh đem cũng mới không lâu, tinh lực tích lũy rất ít, có thể một hơi đột phá hai cái cảnh giới, cực kỳ khó được. \n\n \"Sau đó chính là trở về á nhân tinh vực về sau, lại dùng Thương Tinh Ma Điển đột phá.\" \n\n Diệp Nhiên trong lòng suy tư, tới Cổ Chiến Trường muốn làm  tất cả mọi chuyện, đều đã hoàn thành, không sai biệt lắm có thể trở về rồi. \n\n Đương nhiên, trước khi rời đi lại chuyển chuyển này truyền thừa địa. \n\n Bây giờ đột phá Tinh Quan, có thể luyện hóa lại một cái kỳ vật, hơn nữa đó cái Vũ cấp  Tinh Khải Chi Nhãn, hắn cũng cảm thấy rất hứng thú. \n\n \"Một năm qua đi, không rõ ràng đều xông đến bao nhiêu nhốt, hi vọng Tinh Khải Chi Nhãn không có bị lấy đi...\" \n\n... \n\n Ngoại giới, hài cốt chung quanh tràn ngập hắc khí bên trên. \n\n Người tu hành đã đạt đến hơn ba vạn. \n\n \"Này truyền thừa quan độ khó thật đúng là cao, cho đến bây giờ, liền Thần Vô thủ đô lâm thời mới thông qua tam quan.\" \n\n \"Khó là khó khăn, nhưng mỗi đóng truyền thừa khôi lỗi cũng là đại Tinh Vương, truyền thụ khác biệt  tinh thuật cùng tu luyện kỹ xảo, này thế nhưng là chuyện tốt a.\" \n\n\"Đúng vậy a, Này chút truyền thừa khôi lỗi cũng có bộ phận Thập Thần thiên tử ký ức, nghe một chút cũng thu hoạch không ít.\" \n\n \"Tiếc là chúng ta ngăn cách, không cách nào nghe được...\" \n\n Từng người từng người người tu hành nhìn lên bầu trời bên trong hình chiếu, nghị luận ầm ĩ, không ít người trong mắt còn có hâm mộ. \n\n Trước mặt cơ sở quan cùng cao cấp quan, so sánh với này truyền thừa quan, vẫn là tiểu vu kiến đại vu, không riêng gì độ khó, càng là thu hoạch. \n\n Truyền thừa quan nội đó chút truyền thừa khôi lỗi, đều sẽ truyền thụ một loại tinh thuật hoặc tu luyện tri thức. \n\n Tương đương với nửa cái chúa tể làm lão sư rồi. \n\n Đương nhiên, đối với Thần Linh Tộc tới nói không phải quá hữu hảo. \n\n Bởi vì truyền thụ cho những kiến thức này, phần lớn là ở trong giáo mặt  truyền thừa giả, như thế nào đánh giết Thần Linh Tộc... \n\n Có người tu hành mắt liếc Thần Linh Tộc, liền thấy tất cả Chân Vương đều sắc mặt âm trầm vô cùng. \n\n Còn có người nhìn về phía trên bầu trời  truyền thừa giả bảng danh sách, có chút hiếu kỳ nói. \n\n \"Thần Vô Hành truyền thừa tiến độ là 48% , theo lý thuyết, có thể nhận lấy Vũ cấp kỳ vật Tinh Khải Chi Nhãn a?\" \n\n \"Ta đoán chừng Thần Vô làm được mục tiêu, là Thần Diệu Cốt, cái này cần 80%  truyền thừa tiến độ, chắc chắn sẽ không bây giờ nhận lấy.\" \n\n\"Cũng đúng, Này ba cái Vũ cấp kỳ vật, mỗi cái truyền thừa giả chỉ có thể lựa chọn một cái.\" \n\n \"Mau nhìn, lại có người truyền thừa tiến độ đạt đến 40% rồi, còn đem Tinh Khải Chi Nhãn lĩnh đi rồi, là số hai mươi lăm!\" \n\n \"Số hai mươi lăm, số hai mươi lăm là ai?\" \n\n Một mảnh xôn xao bên trong. \n\n Ở vào ở giữa nhất tầng  lục đại cường tộc, cũng có Chân Vương nhìn lại, liền thấy bầu trời  trong hình chiếu, hiện lên một cái cao gầy thiếu niên  , nhìn có chút phổ thông. \n\n Nhưng lúc này lại giống như là phát giác được chúng  ánh mắt đồng dạng, thản nhiên nhìn bọn họ một cái. \n\n Thấy thế, tất cả Chân Vương có  khác thường, có  nhíu mày, có  kinh dị một tiếng. \n\n \"Linh lúc tuấn, đây là các ngươi Thần Linh Tộc  cái nào thiên tài?\" \n\n Vừa mới tà hừ lạnh nói: \"So Thần Vô Hành mạnh mấy người kia, ta đều nghe qua, không có một cái là trung cấp Tinh Quan.\" \n\n Cổ Ma Tộc cũng có Chân Vương đôi mắt lấp lóe, \"Này thiếu niên tựa hồ thật không đơn giản a, chỉ có trung cấp Tinh Quan, thế mà so ma chúc bọn họ thông quan nhanh. \n\n Hơn nữa, phía trước tiến vào truyền thừa quan lúc, trải qua  sinh tử sân thi đấu, đối thủ của hắn... Vậy mà tự sát?\" \n\n Nghe vậy, nhất thời cái khác ngũ đại cường tộc, bao quát thần sắc chần chờ Thần Minh Tộc cũng nhìn về phía Thần Linh Tộc. \n\n Lại giống như là cũng không rõ. \n\n Hắc khí bên trên  những người tu hành đồng dạng thấp giọng trò chuyện. \n\n Đều là đối với tại đó hơn nửa năm trước phát sinh một màn, khắc sâu ấn tượng. \n\n Thần Linh Tộc chúng Chân Vương lạnh nhạt không nói, không ai giám ứng. \n\n Lúc này, có người giật mình nói: \"Số tám  hình chiếu lại xuất hiện, hắn đi ra!\" \n\n Lập tức tất cả mọi người lực chú ý bị hấp dẫn. \n\n Liền thấy trên bầu trời, lần nữa thêm ra một cái hình chiếu, là một cái cát vàng cuồn cuộn cửa ải, trên không có cái màu lam vòng xoáy. \n\n Vòng xoáy bên trong, một thân ảnh đi ra. \n\n Diệp Nhiên cúi đầu liếc nhìn chung quanh, liền thấy cửa ải bên trong, đã trống rỗng, chỉ có hai ba cái tại vượt quan tuổi trẻ thiên tài. \n\n Thời gian một năm Quá khứ, rõ ràng số đông có thể thông quan người, đều sớm đã rời đi. \n\n Mà tại phụ cận, còn có ba người khoanh chân tu luyện. \n\n \"Thiên Ma Tộc?\" \n\n Hắn quay đầu mắt nhìn, có chút ngoài ý muốn, trong đó còn có đó cái Tứ Tinh Khiếu  Ma Diệu Yên, \n\n Tứ Tinh Khiếu xông qua tất cả cao cấp quan, cũng không thành vấn đề, làm sao lại lưu tại nơi này, đang chờ cái gì? \n\n Chẳng lẽ đang chờ ta? \n\n Hắn nói thầm trong lòng một tiếng, ngược lại là cũng không để ý, mặc dù tao ngộ qua hai ba lần, nhưng cũng không phát sinh mâu thuẫn gì, liền không có suy nghĩ nhiều, chuẩn bị đi tới cửa ải tiếp theo. \n\n \"Hỏng... Ma Diệu Yên, hắn đi ra!\" \n\n Lúc này, đó một béo một gầy hai cái Thiên Ma Tộc kinh hỉ hô to, tiếp theo lại cùng nhau sốt ruột nói. \n\n \"Ngươi trước tiên đừng động thủ, để chúng ta đến, tiểu tử này hại chúng ta chờ lâu như vậy, để chúng ta hai anh em trước tiên giáo huấn hắn một trận!\" \n\n Đang khi nói chuyện, hai tôn khổng lồ  Tinh tướng thể hiện lên. \n\n Này hai tôn Tinh tướng thể oanh giẫm mạnh mặt đất, toàn thân tinh lực bộc phát, hai cái khổng lồ  màu lam cự thủ, bỗng nhiên chụp vào phía trước thiếu niên."},{"num":1054,"id":"7622786","rawTitle":"ngươi có thể hay không để bọn hắn tụ tập một chút?","title":"NGƯƠI CÓ THỂ HAY KHÔNG ĐỂ BỌN HẮN TỤ TẬP MỘT CHÚT?","content":"\"Nếu không phải là tiểu tử ngươi, chúng ta cũng sẽ không không công chậm trễ thời gian một năm, ăn trước một quyền của ta!\" \n\n Béo Thiên Ma Tộc hét to một tiếng, sau lưng Tinh tướng thể bỗng nhiên đổi thành chưởng vì quyền, bá mà một chút tăng thêm tốc độ, một quyền xé rách không khí hung mãnh đánh tới. \n\n Bên cạnh gầy Thiên Ma Tộc giận dữ, \"Cái tên khốn kiếp ngươi, ngươi một chút đem hắn đánh cho tàn phế, ta còn thế nào động thủ?\" \n\n Béo Thiên Ma Tộc giống như là không có nghe được, đứng chắp tay, mập mạp trên mặt tròn tràn đầy ngạo nghễ. \n\n \"Ngươi nếu có thể kháng trụ ta một quyền này, ta có thể tha cho ngươi một cái mạng, cho nên vận dụng ngươi  toàn bộ thực lực đi, không phải vậy...\" \n\n Lời còn chưa nói hết, tiếp theo một cái chớp mắt. \n\n Ầm! \n\n Một hồi đất rung núi chuyển, phảng phất toàn bộ cửa ải đều phát sinh một hồi động đất. \n\n Từng tòa tam giác cát tháp đổ sụp. \n\n Mặt đất nứt ra, kinh khủng cái khe to lớn lan tràn, xuất hiện từng đạo sâu không thấy đáy khe rãnh, cát bụi ngập trời giống như phun lên bầu trời. \n\n Gần như trong nháy mắt, toàn bộ cửa ải trung ương đều bị thổ hoàng sắc  bão cát che lấp. \n\n Ngắn ngủi yên lặng phía sau. \n\n Bão cát tán đi, mà cát tháp quần trung ương đã hoàn toàn biến mất, chỉ còn lại một cái hố to, ước chừng một phần ba  cát tháp đều ngã vào trong đó. \n\n Giữa không trung, đó đang giành trước cướp phía sau vọt tới hai tôn Tinh tướng thể, cơ thể quỷ dị cứng đờ. \n\n Tiếp theo thân thể dày đặc vô số đạo khe hở, răng rắc phá toái. \n\n Hóa thành vô số năng lượng tiêu tan không thấy. \n\n Diệp Nhiên chậm rãi thu hồi chân, con mắt nhắm lại, nhìn về phía phía trước thần sắc đờ đẫn hai cái Thiên Ma Tộc. \n\n Mới vừa rồi, hắn nhẹ đạp xuống mặt đất. \n\n \"Nguyên lai các ngươi ở đây, thật đúng là vì chờ ta a?\" hắn hơi kinh ngạc, ngữ khí lại hơi có vẻ băng lãnh. \n\n \"Không, không có...\" \n\n Hai cái Thiên Ma Tộc toàn thân cứng ngắc, giống như là bị cái gì hồng thủy mãnh thú để mắt tới, cơ thể không thể động đậy. \n\n Béo Thiên Ma Tộc phản ứng nhanh nhất, mặt tươi cười nói: \"Chúc mừng số tám ngươi tại Tinh Thiên Linh Cảnh bên trong thực lực đại trướng, tinh thuật càng là đạt đến hóa cảnh!\" \n\n \"Đúng đúng, ngươi này cửa bộ pháp tinh thuật quá mạnh mẽ!\" \n\n Gầy Thiên Ma Tộc cũng phản ứng lại, thần sắc nịnh nọt, \"Này hẳn là một môn Vũ cấp tinh thuật đi, lại có thể tu luyện tới cảnh giới như thế, giống như là tùy ý đạp chân, lợi hại, thật lợi hại!\" \n\n \"Có thể đem Vũ cấp tinh thuật vận dụng phải vô cùng kì diệu, có thể xưng thế hệ trẻ tuổi đệ nhất nhân, mười cái Ma Diệu Yên cũng không bằng ngươi...\" \n\n Diệp Nhiên mi đầu hơi nhíu, này hai người đang quỷ kéo cái gì? \n\n Cái gì Vũ cấp tinh thuật? \n\n Hắn vừa mới không phải liền là tùy ý đạp chân, chấn vỡ này hai tôn Tinh tướng thể, đều kéo tới đi nơi nào? \n\n \"Đừng nói những này nói nhảm, trông coi ta muốn làm gì?\" \n\n Hắn ánh mắt bất thiện, \"Nói không nên lời, liền đi cùng các ngươi  Tinh tướng thể đi.\" \n\n Hai cái Thiên Ma Tộc nghe này mặt mũi trắng bệch. \n\n Béo Thiên Ma Tộc sỉ sỉ sách sách nói: \"Số tám, chúng ta không phải gây phiền phức cho ngươi, là vì chúc mừng ngươi từ Tinh Thiên Linh Cảnh đi ra, cố ý cầm Tinh tướng thể đến cấp ngươi luyện tay.\" \n\n \"Không sai, ở một năm thời gian, ngươi chắc chắn rất ngứa tay đi, không có việc gì, hướng này bên trong đánh, da dày cực kì...\" \n\n Gầy Thiên Ma Tộc chỉ vào béo Thiên Ma Tộc  mặt béo, đồng thời vội vàng truyền âm nói: \"Ma Diệu Yên, ngươi còn nhìn xem làm gì, nhanh chóng xuất thủ a!\" \n\n Ma Diệu Yên nhìn xem dưới chân  hố to, gương mặt xinh đẹp ngưng trọng, trong lòng có chút hãi nhiên. \n\n Này loại cấp bậc lực phá hoại, nàng cũng xa xa không cách nào đạt đến! \n\n Này cái số tám vẻn vẹn chỉ là tiến vào lần Tinh Thiên Linh Cảnh, thực lực liền đã siêu việt nàng! \n\n Nghĩ tới đây, nàng bất động thanh sắc lui ra phía sau, \"Các ngươi hai cái chống đỡ, ta đi tìm Thủy Ma tộc  ma chúc cầu viện!\" \n\n Hai cái Thiên Ma Tộc cực kỳ hoảng sợ, \"Ma Diệu Yên, ngươi muốn bán đồng đội?\" \n\n \"Đương nhiên muốn xuất bán các ngươi.\" Ma Diệu Yên mặc dù nói như vậy, nhưng lui ra phía sau lúc lại bắt lấy hai người, chuẩn bị cùng nhau rời đi, bỗng nhiên nàng phát giác được cái gì, biến sắc. \n\n Liền thấy một cái thon dài bàn tay chộp tới. \n\n \"Thiên Ma Tướng!\" \n\n Ma Diệu Yên khẽ kêu một tiếng, mi tâm mặt nạ ấn ký bộc phát quang mang, nháy mắt, hắn khuôn mặt biến ảo bất thành cùng khuôn mặt. \n\n Từng trương tuyệt đẹp thiếu nữ gương mặt hiện lên, hoặc xinh đẹp, hoặc dịu dàng, hoặc tú nghiên, hoặc điềm tĩnh... Thiên hình vạn trạng, không ngừng biến hóa. \n\n Theo loại biến hóa này, trên người tinh lực cũng đang nhanh chóng trở nên mạnh mẽ, đồng thời còn có loại mị hoặc cảm giác truyền ra. \n\n Diệp Nhiên cấp năm ý niệm không gian, tăng thêm tinh lực cường hãn, loại này mị hoặc đồng thời không có cái gì tác dụng, nhưng hắn vẫn là run lên, ẩn ẩn nhìn thấy một khuôn mặt. \n\n Có chút cùng lam tinh thượng  khương ngọc tương tự, nhường hắn ngắn ngủi ngây người. \n\n Tiếp theo một cái chớp mắt. \n\n Hắn vốn là chụp vào Ma Diệu Yên phía sau cổ áo  tay, cũng thay đổi đổi phương hướng, bắt được cổ tay, đồng thời một cỗ cường hoành tinh lực trấn áp xuống. \n\n Ma Diệu Yên đang tại biến ảo gương mặt lập tức dừng lại, tăng trưởng tinh lực cũng đình trệ, chỉ cảm thấy toàn thân cũng không dùng tới mảy may tinh lực, có chút sợ hãi. \n\n Này cái số tám, so trong tưởng tượng mạnh hơn! \n\n \"Không hổ là thập đại cường giả tộc, huyết mạch thiên phú chính là mạnh.\" \n\n Diệp Nhiên nhìn một chút Ma Diệu Yên, vừa mới biến hóa ra tới khuôn mặt, là trương khôn khéo thiếu nữ khuôn mặt, cùng phía trước hoàn toàn khác biệt. \n\n Nhưng này cũng hư giả, đồng dạng là chân thực  một loại bề ngoài, tương đương với một người thiên diện. \n\n Đương nhiên biến hóa lớn nhất, vẫn là hắn tinh lực, đề thăng biên độ không thiếu. \n\n Là hắn cũng thất kinh  một loại trình độ. \n\n Đã từ bốn mươi ba đoạn, đạt đến tới gần năm mươi đoạn  tinh lực. \n\n Mặc dù có thể cùng Viêm Hoàng thân rồng như thế không bền bỉ, nhưng ngắn ngủi duy trì một hồi, cũng khá kinh người rồi. \n\n \"A, không có xương cốt?\" \n\n Hắn kinh ngạc nhìn một chút Ma Diệu Yên cổ tay, có chút kinh dị, này Thiên Ma Tộc nhìn như là thân người, lại thể nội không có xương cốt. \n\n Quả nhiên này vạn tộc kỳ dị, cái gì cũng có. \n\n Không nghĩ nhiều, hắn nhàn nhạt hỏi: \"Các ngươi ba cái chờ ta làm gì?\" \n\n \"Muốn hỏi một chút ngươi đó hỏa diễm Tinh tướng thể bên trên  vương miện là cái gì.\" \n\n Ma Diệu Yên chớp mắt một cái, điềm đạm đáng yêu nói:\"Không có ác ý gì, thật chỉ là hỏi một chút mà thôi.\" \n\n Nàng này trương khôn khéo thiếu nữ khuôn mặt, phối hợp loại vẻ mặt này, lộ ra có chút làm người trìu mến. \n\n \"Vương miện?\" \n\n Diệp Nhiên liền giật mình, lúc này mới nhớ tới, tự mình giống như đúng là những này Thiên Ma Tộc trước mặt, triển lộ qua Tinh tướng thể. \n\n\"Trở về Phải hảo hảo nghiên cứu một chút này tiểu vương quan rồi, một số thời khắc, hay là muốn che lại tốt.\" \n\n Hắn trong lòng âm thầm suy nghĩ, nói tiếp: \"Vương miện, ngươi rất muốn biết?\" \n\n\"Ừm.\" \n\n Ma Diệu Yên đôi mắt sáng lên, còn không có phản ứng lại, liền mơ hồ xem đến đối phương mang theo tự mình phía sau cổ áo, giống như là xách gà con đồng dạng, trực tiếp đem nàng ném qua một bên. \n\n Đồng thời còn lười biếng nói: \"Đại nhân sự việc, tiểu hài tử đừng hỏi nhiều.\" \n\n \"Tiểu hài tử?\" \n\n Ma Diệu Yên giận dữ, \"Ta hai trăm bảy mươi lăm tuổi, ngươi bao nhiêu tuổi? Chờ một chút, ngươi vừa mới xách ta gáy...\" \n\n Nàng ngẩn ngơ, đột nhiên phản ứng lại, xù lông thét to: \"Truyền thừa quan nội chuyện phát sinh, ngoại giới đều có thể nhìn thấy, ngươi xách ta một cái mỹ thiếu nữ  gáy? \n\n Ngươi có nhiều như vậy nắm lấy biện pháp của ta, tại sao muốn dùng này mất mặt nhất một loại, truyền đi ta đều không khuôn mặt hồi tộc bên trong rồi, a a a...\" \n\n Ma Diệu Yên nắm lấy tóc, thần sắc phát điên, một béo một gầy hai cái Thiên Ma Tộc ở bên cạnh nín cười. \n\n Này phía dưới muốn danh tiếng quét sân! \n\n Đáng đời, này chính là nữ nhân xấu nên có  hạ tràng, làm tốt lắm. \n\n \"Xách ngươi gáy không nhiều bình thường.\" \n\n Diệp Nhiên lơ đễnh, vốn là muốn trực tiếp một cước đá bay, này coi như là hạ thủ lưu tình. \n\n Hắn không tiếp tục để ý ba cái này, chuẩn bị rời đi. \n\n Đột nhiên nghĩ tới cái gì, kinh ngạc quay đầu lại nói: \"Ngươi vừa mới nói, này truyền thừa trong đất chuyện phát sinh, ngoại giới có thể nhìn thấy? \n\n Bao quát các ngươi những này cường tộc thật vương, cũng có thể nhìn thấy?\" \n\n Diệp Nhiên nói, có chút hưng phấn lên, \"Vậy ngươi bây giờ có thể hay không để cho bọn họ tụ tập một chút?\""},{"num":1055,"id":"7622787","rawTitle":"ta có đại sự muốn nói cho bọn hắn biết","title":"TA CÓ ĐẠI SỰ MUỐN NÓI CHO BỌN HẮN BIẾT","content":"Diệp Nhiên tâm niệm thay đổi thật nhanh, khó trách phía trước ở nơi này truyền thừa trong đất, thỉnh thoảng, luôn cảm giác có người ở nhìn trộm. \n\n Hiện tại xem ra, hẳn là cái kia huyết nhãn đem này bên trong tràng cảnh phát hình ra đi rồi. \n\n Hắn đôi mắt lấp lóe, ẩn ẩn có mấy phần chờ mong, cũng không biết này dạng đến cùng được hay không, theo lý thuyết là không có vấn đề. \n\n Chính là không rõ ràng, có thể gọi tới bao nhiêu Chân Vương. \n\n Nghĩ tới đây, hắn quay đầu nhìn về phía Ma Diệu Yên, \"Giúp ta gọi tất cả Chân Vương tụ tập một chút, ta có đại sự muốn nói cho bọn hắn biết!\" \n\n \"Đại sự?\" \n\n Ma Diệu Yên ánh mắt khác thường, \"Cái đại sự gì, cần tất cả Chân Vương tụ tập?\" \n\n \"Chuyện rất trọng yếu!\" \n\n Diệp Nhiên nghiêm túc nói: \"Cùng ngươi nói cũng không hiểu, ngươi chỉ cần hỗ trợ la lên một chút phía ngoài Chân Vương là được, nhất định muốn mau chóng, không có nhiều thời gian.\" \n\n Nói, hắn còn cảnh giác nhìn một chút chung quanh, giống như là tại đề phòng cái gì. \n\n Thấy hắn biểu lộ ngưng trọng như vậy, Ma Diệu Yên giật mình, \"Ta cũng không rõ ràng thủ hộ huyết nhãn, hôm nay là có hay không tại phát ra chúng ta này bên trong tràng cảnh. \n\n Thủ hộ huyết nhãn đang tùy cơ phát ra tràng cảnh , cũng là một cái số thứ tự vì hai mươi lăm  Thần Linh Tộc, nhắc nhở Thần Vô Hành, gọi hắn chú ý nói chuyện hành động lúc, người khác nghe được. \n\n Nhưng này sự kiện chưa hẳn làm thật. . . chờ một chút...\" \n\n Ma Diệu Yên gương mặt xinh đẹp đột nhiên thay đổi, lui ra phía sau mấy bước, \"Ngươi đang lừa chúng ta, ngươi muốn giết chúng ta? \n\n Cướp tiền vẫn là cướp sắc, ngươi đánh chết chúng ta, coi như ngoại giới không người nhìn thấy, chúng ta Thiên Ma Tộc tộc ấn cũng sẽ phụ thể!\" \n\n \"Cướp sắc? Ngươi nghĩ hay thật.\" \n\n Diệp Nhiên ngữ khí bất thiện nói: \"Nhường ngươi giúp cái chuyện nhỏ mà thôi, ngươi liền muốn chiếm tiện nghi ta?\" \n\n Hắn nghiêm mặt nói: Tốt, mặc kệ ngoại giới có thể hay không nhìn thấy, mau chóng để các ngươi Thiên Ma Tộc Chân Vương, kêu gọi ngoại giới khác Chân Vương, tất cả tập hợp một chút \n\n Thật là một kiện rất trọng yếu đại sự, ta nhất định phải nói cho bọn hắn!\" \n\n \"Ai chiếm ai tiện nghi a, hỗn đản!\" \n\n Ma Diệu Yên phát điên, hận đến nghiến răng, này gia hỏa nói chuyện là chân khí người, nếu không phải là đánh không lại. \n\n Cần phải thật tốt thu thập thứ nhất ngừng lại mới được. \n\n Bất quá dưới mắt địa thế còn mạnh hơn người, tăng thêm chính xác rất hiếu kì, đối phương nói cho đúng là cái đại sự gì, cần thông tri ngoại giới tất cả Chân Vương, cho nên cũng liền làm theo. \n\n Nàng đầu tiên là tay ngọc vung lên, bố trí xuống một tầng khổng lồ  tinh lực tráo, đem bốn người bao phủ ở bên trong. \n\n Lại đốc làm cho đó một béo một gầy hai cái Thiên Ma Tộc đến trông coi. \n\n Hai cái Thiên Ma Tộc có chút tức giận, \"Ma Diệu Yên, chuyện trọng yếu như vậy, chúng ta cũng phải nghe!\" \n\n \"Không đi?\" \n\n Ma Diệu Yên cười lạnh một tiếng, vung lên tú quyền, vừa vặn có khí không có chỗ vung, đánh không lại gia hỏa này, còn khi dễ không được hai người các ngươi? \n\n Đó hai cái Thiên Ma Tộc sắc mặt tại chỗ thay đổi, mặt mũi tràn đầy cười làm lành, \"Nguyện vì công chúa cống hiến sức lực.\" \n\n Nói xong rất là vui vẻ một trái một phải trông coi tinh lực trùm tới rồi. \n\n Diệp Nhiên trong lòng suy tư, nếu như ngoại giới không nhìn thấy, đó thành tựu cũng liền không cách nào kích hoạt, còn có thể lần sau lại hoàn thành. \n\n Cho nên thử một lần, chắc chắn không có chỗ xấu. \n\n Đương nhiên nếu như có thể nhìn thấy, hi vọng nhiều tới mấy vị Chân Vương, không phải vậy liền bệnh thiếu máu rồi. \n\n Dù sao này thành tựu là một lần duy nhất, kích hoạt nhất định phải dùng. \n\n Lúc này, Ma Diệu Yên quay đầu ngưng thanh nói:\"Ta đã để chúng ta Thiên Ma Tộc  tiền bối, triệu tập các tộc Chân Vương rồi, nếu như bọn họ có thể trông thấy, nhất định sẽ làm theo.\" \n\n\"Được, Đa tạ.\" \n\n Diệp Nhiên thở sâu, tiếp đó tại chỗ bắt đầu vung vẩy hai đầu cánh tay, hoạt động gân cốt. \n\n Ma Diệu Yên đôi mắt lóe lên, nhìn đối phương bộ dạng này, đích thật là kiện rất chuyện gấp gáp rồi, nghĩ tới đây nàng càng hiếu kì. \n\n Đến cùng là có chuyện gì? Là này Thập Thần thiên tử truyền thừa mà  bí mật sao? \n\n Vẫn là này truyền thừa trong đất có âm mưu gì? \n\n Khả năng rất lớn, không phải vậy đối phương sẽ không chờ này sao nhiều Chân Vương tụ tập mới có thể nói, chứng minh cần Chân Vương trợ giúp. \n\n \"Thập Thần thiên tử...\" \n\n Ma Diệu Yên đang nghĩ ngợi, bỗng nhiên nhìn một chút cách đó không xa, truyền âm nói: \"Muốn hay không chuyển sang nơi khác?\" \n\n Theo nàng ánh mắt nhìn lại, liền thấy tinh lực tráo bên ngoài nằm sấp một khỏa huyết nhãn, huyết nhãn đầu đội lên một cây kim loại dây anten, lúc này huyễn hóa ra một cái cực lớn  tinh lực lỗ tai. \n\n Nghiêng tai lặng lẽ tựa ở tinh lực khoác lên nghe. \n\n \"Không cần.\" \n\n Diệp Nhiên thở sâu, \"Bây giờ, ta liền đem cái này đại sự, nói cho các ngươi biết!\" \n\n Thoại âm rơi xuống, hắn đột nhiên phóng lên trời. \n\n Nhất thời, Ma Diệu Yên cùng đó mập gầy hai cái Thiên Ma Tộc, tăng thêm huyết nhãn cũng là kinh ngạc ngẩng đầu nhìn lại. \n\n Cùng một thời gian. \n\n Ngoại giới. \n\n Bàng bạc hài cốt hắc khí bên trên, hơn một trăm tôn Chân Vương đứng thẳng, ngửa mặt lên trời nhìn lên bầu trời, biểu lộ ngưng trọng. \n\n Trừ bỏ lục đại cường tộc thật vương, cái khác các chủng tộc thật Vương Dã tới rất nhiều. \n\n Có thể nói lúc này hắc khí bên trên tám thành Chân Vương tụ tập. \n\n Thiên Ma Tộc thật vương mở miệng, chủng tộc khác , hay là muốn cho ít mặt mũi, sẽ không cự tuyệt. \n\n Đến nỗi mặt khác ngũ đại cường tộc thật vương, là bản thân liền tại phụ cận. \n\n Lúc này những này Chân Vương cùng nhau nhìn lên bầu trời bên trong hình chiếu, từng cái tâm tư dị biệt, nhưng đều không người nói chuyện, đều là nhìn không chớp mắt nhìn chằm chằm. \n\n Đến cùng là có chuyện gì... \n\n Đột nhiên, tất cả Chân Vương ánh mắt ngưng lại, gắt gao nhìn chăm chú về phía đó giữa sân đằng không mà lên  thiếu niên áo tím. \n\n Muốn nói ! \n\n... \n\n Bão cát phun trào  cao cấp quan nội. \n\n Diệp Nhiên xông lên bầu trời, tiếp đó thẳng tắp rơi xuống, lúc rơi xuống khí thế ngập trời mà hét to một tiếng, \"Cung nghênh vua của các ngươi!\" \n\n Âm thanh hùng hồn, cuồn cuộn truyền vang hướng chung quanh. \n\n Tinh lực tráo trong nháy mắt bị rung sụp, toàn bộ cửa ải bên trong, đều tràn đầy cực lớn  sóng âm, tạo thành tiếng vang giống như từng lớp từng lớp vừa đi vừa về bao phủ. \n\n Kéo dài không dứt, không ngừng vang dội đi lại. \n\n \"Cung nghênh vua của các ngươi...\" \n\n \"Vua của các ngươi...\" \n\n \"Vương...\" \n\n Giữa sân hoàn toàn tĩnh mịch. \n\n Nơi xa một béo một gầy hai cái Thiên Ma Tộc hai mặt nhìn nhau, mặt mũi tràn đầy mộng. \n\n Ma Diệu Yên thần sắc cứng ngắc, trong mắt hiếu kì dần dần biến mất, chỉ còn dư mờ mịt, nàng thì thào một tiếng. \n\n \"Ta đang chờ mong cái gì? Đã sớm hẳn là nghĩ tới a, cũng không phải không nhìn thấy qua hắn cầm đầu đụng thiên thạch  một màn kia, lại còn tin hắn  tà...\" \n\n \"Hô ~\" \n\n Diệp Nhiên thở dài ra một hơi, đem rớt xuống đất  kim loại dây anten nhặt lên, một lần nữa sao đến trên đầu, xem xét phía dưới thành tựu. \n\n Lập tức trong lòng vui mừng, thế mà thật hoàn thành. \n\n Ròng rã bốn vạn lẻ hai trăm thành tựu điểm. \n\n Dựa theo một cái Chân Vương ba trăm thành tựu điểm tới tính toán, đó chính là ròng rã một trăm ba mươi bốn cái Chân Vương. \n\n \"Bốn vạn thành tựu, kiếm lợi lớn!\" \n\n Hắn vui sướng trong lòng vừa mới tuôn ra, tiếp theo khuôn mặt liền trở nên đắng, hơn một trăm cái Chân Vương, này phía dưới phải xong đời. \n\n \"Chạy trước đường!\" \n\n Nghĩ xong, hắn không nói hai lời vội vội vàng vàng rời đi. \n\n Chỉ để lại tại chỗ trong gió xốc xếch ba cái Thiên Ma Tộc, cùng một cái tròng mắt. \n\n \"Một đám ngu xuẩn, này đều có thể bị lừa, ngu xuẩn bạo!\" \n\n Huyết hồng mắt dọc tức hổn hển mắng, đột nhiên đem đó chỉ tinh lực lỗ tai nổ tung, tiếp đó lại đem đỉnh đầu  kim loại dây anten gỡ xuống, huyễn hóa ra một cái tinh lực chân to. \n\n Dùng sức đạp đếm chân, đem dây anten giẫm bạo, phát tiết xong nộ khí này mới hóa thành một đạo huyết quang một lần nữa bay về phía bầu trời. \n\n Ngoại giới. \n\n Hài cốt chung quanh hắc khí bên trên, đồng dạng hoàn toàn tĩnh mịch. \n\n Từng người từng người phổ thông người tu hành thân thể hơi rung động. \n\n Các đại chủng tộc  Tinh Vương cao thủ, đồng dạng cảm nhận được bầu trời phảng phất đều âm trầm xuống, trời u ám, có cỗ vô hình  túc sát chi khí tràn ngập. \n\n Mà hết thảy này  đầu nguồn, đều là tới từ phía trước. \n\n Có người tu hành nhìn về phía phía trước đó hơn một trăm vị giống như hóa đá giống như, cứng tại tại chỗ không nhúc nhích Chân Vương. \n\n Không khỏi nuốt nước miếng một cái. \n\n Trong lòng nhịn không được phun ra hai chữ, \"Ngưu tệ!\""},{"num":1056,"id":"7622788","rawTitle":"siêu tiêu số tám","title":"SIÊU TIÊU SỐ TÁM","content":"Hơn một trăm vị Chân Vương, mặt không biểu tình tản ra, riêng phần mình trở lại trong tộc. \n\n Toàn bộ hắc khí bên trên an tĩnh đến đáng sợ. \n\n Tất cả người tu hành cấm thanh bất ngữ, cho dù là Tinh Vương, cũng đều cúi đầu mắt cúi xuống, giống như là không thấy vừa mới một màn kia. \n\n Có thể tu luyện tới loại cảnh giới này, đều không ngốc, biết giả bộ như cái gì đều không phát sinh, mới có thể bảo mệnh. \n\n Không phải vậy nói ra, sợ là có thể bình yên vô sự người rời đi không có nhiều. \n\n Cũng phải bị hủy thi diệt tích. \n\n \"Này cái số tám, đơn giản không muốn sống nữa, Chân Vương cũng dám đùa nghịch...\" \n\n Nhất thời, hắc khí bên trên tất cả trầm mặc người tu hành trong đầu, đều xuất hiện một cái ý niệm như vậy, số tám nếu là thật có thể còn sống trở về. \n\n Toàn bộ tứ đại tinh không, đều sẽ truyền khắp hắn hôm nay làm  chuyện. \n\n Này một chuyện khoa trương trình độ, gần với hắn là một cái hai mươi hai tuổi Tinh tướng. \n\n Không đúng, bây giờ hẳn là hai mươi ba tuổi Tinh Quan. \n\n Nghĩ tới đây, có người tu hành thấp giọng cảm khái, \"Thế mà thật đột phá Tinh Quan rồi, cho dù là tiến Tinh Thiên Linh Cảnh cũng không dễ dàng như vậy.\" \n\n \"Có tinh cốt, tăng thêm nhiều sao khiếu  nguyên nhân đi.\" \n\n Có người nói chuyện lúc, liếc một cái xa xa Thủy Ma tộc Chân Vương. \n\n Phía trước chính là Thủy Ma tộc thật vương, nói số tám hẳn là đột phá cấp năm ý niệm không gian, mới có thể tại Tinh tướng cảnh, đạt đến có thể đánh giết Tinh Vương  trình độ. \n\n Chỉ là đối phương cho rằng, số tám rất không có khả năng đột phá Tinh Quan. \n\n Đến nỗi nguyên nhân... \n\n Bởi vì Thủy Ma trong tộc, không có này sao trẻ tuổi  Tinh Quan, bọn họ chưa bao giờ từng thấy. \n\n \"Đột phá quá nhanh\" \n\n Một cái người tu hành cảm thán nói: \"Vừa đột phá Tinh Quan, thế mà liền có thể đánh bại dễ dàng Ma Diệu Yên này dạng  Tứ Tinh Khiếu thiên tài.\" \n\n Nơi xa, lục đại cường tộc thật vương thần sắc nghiêm nghị, ánh mắt có chút trầm trọng. \n\n Này cái số tám, chính xác vượt qua dự liệu. \n\n Đồng dạng Tứ Tinh Khiếu ở giữa, cách mỗi một cái tiểu cảnh giới, liền sẽ tinh lực chênh lệch cực lớn, tỉ như Ma Diệu Yên là cao cấp Tinh Quan. \n\n Nhưng cùng đại Tinh Quan  Thần Vô Hành ma chúc ba người, ước chừng chênh lệch mười mấy đoạn. \n\n Có thể thấy được vượt cấp độ khó cao. \n\n \"Hắn bây giờ sợ là đã đột phá tầng hai mươi hai Tinh Nguyên Thân rồi.\" \n\n \"Tuổi còn trẻ, tinh lực ngược lại là phong phú, chẳng những đột phá Tinh Quan, còn có thể có thời gian đột phá Tinh Nguyên Thân.\" \n\n \"Bây giờ sợ là chỉ so với Thần Vô Hành bọn họ yếu một ít, có thể xếp hạng đệ tứ, chờ hắn đột phá tầng hai mươi ba Tinh Nguyên Thân, cái kia Thần Vô Hành bọn họ cũng không tranh nổi.\" \n\n \"Chân Vương phía dưới, tại sao có thể có người đột phá cấp năm ý niệm không gian? Hắn xuất hiện ở đây, quả thực là phá hư cân bằng.\" \n\n \"Yên tâm, tầng hai mươi ba Tinh Nguyên Thân  đột phá, muốn luyện hóa năm trăm vạn Tinh Văn Thiết, hắn không có nhiều thời gian như vậy...\" \n\n Từng cái cường tộc thật Vương Truyền âm trò chuyện. \n\n Bọn họ hoài nghi, chưa bao giờ là đối phương có hay không đầy đủ tài nguyên đột phá Tinh Nguyên Thân. \n\n Mà là đối phương, có hay không thời gian này. \n\n Người tu hành  thời gian là có hạn, học tập tinh thuật, đột phá tinh lực cảnh giới, ý niệm không gian... Làm những này đều cần thời gian. \n\n \"Càng nghĩ càng không thể tưởng tượng nổi.\" \n\n Một cái Thần Linh Tộc Chân Vương nhịn không được nói: \"Hơn hai mươi năm thời gian, hắn sao có thể chiếu cố nhiều như vậy?\" \n\n \"Cũng có nhược điểm đi, hắn thi triển là trụ cấp tinh thuật, mà không phải Vũ cấp, nhất định là thời gian không đủ dùng.\" Cái kia Chân Vương trả lời. \n\n \"Còn tốt không có đức hạnh đã thông qua ba cái truyền thừa quan, như vậy thì coi như hắn đột phá tầng hai mươi ba Tinh Nguyên Thân, cũng đuổi không kịp.\" \n\n Thần Linh Tộc thật Vương Tùng khẩu khí, Thần Diệu Cốt kỳ thật vẫn là thứ yếu. \n\n Chân chính lo lắng, là ma viêm tay mảnh vụn. \n\n Đối phương một khi đột phá tầng hai mươi ba Tinh Nguyên Thân, tinh lực lại sẽ bạo tăng một mảng lớn, hắn đều có chút thay bên trong Thần Vô gì chúa tể  một cái khác cỗ dành thời gian cho việc khác rụt rè. \n\n \"Hừ, vội cái gì!\" \n\n Thủy Ma tộc Chân Vương lạnh rên một tiếng, \"Chỉ là một cái hơn hai mươi tuổi tiểu tử, cũng liền trẻ tuổi, cùng với sớm đột phá cấp năm ý niệm không gian này hai cái ưu thế. \n\n Ngàn tuổi phía dưới cũng là thế hệ trẻ tuổi, hơn hai mươi tuổi cũng coi như, trẻ tuổi có ích lợi gì? \n\n Cấp năm ý niệm không gian, ta các loại chủng tộc thiên tài tu luyện tuế nguyệt phát triển, cũng sớm muộn cũng sẽ đạt đến, bây giờ nhất thời chiếm ưu thôi. \n\n Tương lai ai có thể đột phá làm chúa tể, trở thành nhất tộc trụ cột, mới là vương đạo, ngoài ra đều là hư ảo!\" \n\n \"Chính xác, nguyên cấp huyết mạch vẫn có không nhỏ thiếu sót, hạn mức cao nhất không cao.\" \n\n Thiên Ma Tộc  già nua Chân Vương hơi hơi gật đầu. \n\n \"Lời tuy như thế, nhưng chính xác trẻ tuổi đến đáng sợ, cũng may không phải Vũ cấp huyết mạch, không phải vậy lại là cái kia côn đinh chúa tể.\" \n\n \"A, tinh không vài ức năm, xuất hiện qua vô số kinh tài tuyệt diễm  thiên tài, mỗi người đều từng cùng côn đinh chúa tể so sánh, nhưng cuối cùng chỉ có một cái côn đinh chúa tể!\" \n\n Nghe tam đại ma tộc  trò chuyện. \n\n Thần Linh Tộc Chân Vương lắc đầu, \"Các ngươi ma tộc quá mức tự phụ, này số tám cho dù huyết mạch có thiếu hụt, vẫn như cũ thiên phú kinh người.\" \n\n Không thiếu chủng tộc khác thật vương gật đầu, cái này nói ra lời trong lòng của bọn hắn. \n\n Nhưng mà tiếp theo một cái chớp mắt, Thần Linh Tộc Chân Vương cười nhạt nói: \"Đương nhiên, nếu là hắn có cơ duyên đề thăng huyết mạch, chờ tương lai, vẫn có cơ hội đuổi kịp chúng ta Thần Linh Tộc  hoàn mỹ thiên tài.\" \n\n Hoàn mỹ, đã không có nhược điểm. \n\n Khác Chân Vương im lặng, hợp lấy nửa ngày, vẫn là khen các ngươi tự mình chủng tộc rồi. \n\n Này chút cường tộc một cái so một cái tự tin tự ngạo a. \n\n Bất quá suy nghĩ một chút cũng phải, thập cường chủng tộc đứng sừng sững tinh không ức năm, nội tình thâm hậu, cái gì thiên tài chưa thấy qua. \n\n Thiên tài sẽ không dao động ảnh hưởng bọn hắn, chỉ có cường giả chân chính mới được. \n\n Uyên tộc vẫn như cũ không nói lời nào, ở vào một mảnh trầm mặc. \n\n Nhưng có Chân Vương đang nhìn trên bầu trời, đó nhanh chóng đi tới cửa ải tiếp theo  thiếu niên áo tím... \n\n... \n\n Cự hình cát trên tháp, hiện lên một tòa sa môn. \n\n Là đi tới cái tiếp theo cao cấp đóng. \n\n Diệp Nhiên thu hồi phía trước bay tới nhẫn không gian, ba mươi trắng binh mảnh vụn, cuối cùng hối đoái thành ba mươi vạn Tinh Văn Thiết. \n\n Hắn mong muốn vũ trụ hai cấp tinh thuật, trụ cấp liền cần năm mươi, Vũ cấp càng là ba trăm. \n\n Này một quan đã không đùa, chỉ có thể còn lại hai ải lại nhìn. \n\n Ngoài ra đó chút có thể hối đoái  tài nguyên tuyển hạng bên trong, trừ bỏ tinh thuật, còn có chiến y. \n\n \"Chiến y...\" \n\n Diệp Nhiên trong lòng suy tư, lại nghĩ tới ốc sên Tinh Vương  động phủ, bây giờ đột phá Tinh Quan, chờ trở về liền có thể kế thừa động phủ, không rõ ràng bên trong còn có cái gì đồ tốt. \n\n Lúc này, hắn trong đầu bảng âm thanh vang lên. \n\n 【 Siêu tiêu số tám: Chúc mừng túc chủ, bị trăm vị thật Vương Nhất gây nên cho rằng, ngươi tại cùng tuổi thiên tài bên trong quá mức vượt chỉ tiêu, phá hư truyền thừa bình địa hoành. \n\n Thành tựu hoàn thành, ban thưởng năm ngàn thành tựu điểm. 】 \n\n Diệp Nhiên hơi kinh ngạc, ngẩng đầu nhìn một chút bầu trời, tiếp theo không do dự nữa, tiến vào cửa ải tiếp theo. \n\n Tiếp xuống, vẻn vẹn nửa tháng tả hữu. \n\n Hắn liền thành công sau khi thông qua hai ải. \n\n Này hai ải cùng phía trước một cửa ải kia, không kém nhiều, cũng là thu thập trắng binh mảnh vụn, chỉ là đối thủ đổi, không sai biệt lắm . \n\n Mà này hai ải, phân biệt cầm tới hơn năm mươi trắng binh mảnh vụn, cùng một trăm trắng binh mảnh vụn. \n\n Sở dĩ không có góp đủ ba trăm, là bởi vì thông quan quá muộn, còn lại  chỉ có này một trăm rồi, nhường hắn có chút tức giận. \n\n Phía trước vượt quan thật quá đáng, qua ải coi như xong, còn cầm nhiều tài nguyên như vậy? \n\n Không biết cho người phía sau chừa chút sao? \n\n Cuối cùng đó hơn một trăm năm mươi mảnh vụn, đều bị hắn đổi thành tinh văn thiết, cũng không có đổi tinh thuật. \n\n Vũ cấp  đổi không nổi, trụ cấp  lại có chút phổ thông, còn không bằng Huyền Sát Thần ánh sáng, chỉ có thể tiếp tục đi tới truyền thừa quan nội nhìn một chút. \n\n Rời đi cái thứ ba cao cấp xem xét, theo một trận bạch quang thoảng qua. \n\n Diệp Nhiên một lần nữa trở lại chủ trong thông đạo, theo đi đến phần cuối, lần này, phía trước xa xa hiện lên tám phiến thanh đồng cửa. \n\n Cũng là sau cùng tám cái truyền thừa quan. \n\n Mà ở nơi này tám cái thanh đồng cửa trước, giữa không trung, nổi lơ lửng một tòa cổ lão  sân thi đấu. \n\n Phía dưới, nhưng là năm sáu mươi tên các tộc thiên tài."},{"num":1057,"id":"7622789","rawTitle":"sinh tử sân thi đấu","title":"SINH TỬ SÂN THI ĐẤU","content":"Giữa không trung, từ màu trắng cự thạch kiến tạo cổ lão sân thi đấu nổi lơ lửng, phía dưới là năm sáu mươi cái các tộc thiên tài. \n\n Lúc này những này các tộc thiên tài đều khoanh chân ngay tại chỗ, phân tán tại các nơi, người người thần sắc hờ hững. \n\n \"Lại có truyền thừa giả tới rồi.\" có người thấp giọng nói. \n\n \"Là số tám.\" \n\n \"Số tám, đó cái Tinh tướng?\" \n\n Lập tức, từng đạo ánh mắt khác thường, nhìn về phía đi tới  thiếu niên áo tím. \n\n Diệp Nhiên dừng bước lại, trong lòng kinh ngạc, này sao nhiều truyền thừa giả như thế nào đều đậu ở nơi này, không vào truyền thừa quan? \n\n Hắn liếc nhìn một cái, liền thấy sân thi đấu bên cạnh, còn lơ lửng một cái màn hình to lớn. \n\n Trên màn hình, biểu hiện trước mắt tất cả truyền thừa giả tiến độ. \n\n Hết thảy ba mươi bốn cá nhân, nắm giữ truyền thừa giả tiến độ, xếp tại đệ nhất là số mười bốn, xếp tại cái cuối cùng  chính là hắn. \n\n Số mười bốn  truyền thừa tiến độ, là 50%, ảnh chân dung là một cái trẻ tuổi Thần Linh Tộc, rõ ràng là Thần Vô được. \n\n Xếp tại đệ nhị chính là số hai mươi lăm, truyền thừa tiến độ 48%, ảnh chân dung là một cái Thần Linh Tộc thiếu niên. \n\n Đệ tam đệ tứ, theo thứ tự là ma chúc cùng uyên cổ thụ này hai cái hơn năm mươi đoạn  thiên tài. \n\n Mà từ thứ ba mươi lăm tên bắt đầu, còn lại  truyền thừa giả, cũng không có truyền thừa tiến độ, biểu hiện tin tức đều là vì 0%. \n\n \"Như vậy nhìn tới, bây giờ tiến vào truyền thừa đóng, chỉ có này chừng ba mươi cá nhân.\" \n\n Diệp Nhiên như có điều suy nghĩ, không có tiến vào truyền thừa quan, cho nên mới không có thu được truyền thừa tiến độ, về phần hắn là bởi vì phía trước thứ nhất tiến vào cao cấp quan. \n\n Mới có 5%, không phải vậy bây giờ cũng là zero. \n\n Bất quá kỳ quái Đúng, bây giờ cửa ải trước, này mười mấy cái truyền thừa giả như thế nào không vào trong, chẳng lẽ tiến truyền thừa quan còn có hạn chế? \n\n Cần từng cái xếp hàng chờ? \n\n Hắn khẽ nhíu mày, một lần nữa quan sát, liền thấy dưới màn hình  khung còn có hai hàng quy tắc. \n\n Đang chuẩn bị nhìn lên, một cái tóc bạc người trẻ tuổi cười nói: \"Số tám, có hứng thú hay không đến sân thi đấu phía trên so một hồi? \n\n Muốn vào truyền thừa quan, nhất thiết phải tại sân thi đấu bên trên thắng một lần mới được.\" \n\n Sau lưng có đối với mềm mại  ngân sí, bình thường đều yếu đuối buông xuống, cuốn tại sau lưng, hiển nhiên là một Thần Minh Tộc. \n\n \"Sân thi đấu, khó trách.\" \n\n Diệp Nhiên trong lòng khẽ nhúc nhích, cuối cùng minh bạch vì cái gì đều đậu ở nơi này rồi, bất quá hẳn còn có nguyên nhân khác. \n\n Không phải chỉ là để đơn giản như vậy. \n\n Vốn lấy hắn bây giờ thực lực, cũng là không cần kiêng kị quá nhiều, cũng liền gật gật đầu, \"Có thể.\" \n\n Nói xong, hướng về trên không  sân thi đấu bay đi. \n\n \"Đáp ứng?\" \n\n Đó cái tóc bạc người trẻ tuổi vui mừng quá đỗi, \"Được, ta cái này cùng ngươi bên trên sinh tử sân thi đấu!\" \n\n Này sao đơn giản đáp ứng? \n\n Những người khác cũng là sửng sốt một chút, tiếp theo phản ứng lại, người người thần sắc hối hận. \n\n Này số tám chắc chắn không có nhìn kỹ quy tắc, đáng tiếc, sớm biết tự mình liền gọi hắn bên trên sân đấu. \n\n Này trở về lại bỏ lỡ một cơ hội. \n\n \"Số tám, đừng đi lên, đi lên liền xuống không tới!\" \n\n Lúc này, một cái thanh người thằn lằn cực kỳ hoảng sợ hô to: \"Nhất thiết phải tại sinh tử trong sân đấu, đánh giết một cái đối thủ mới có thể đi vào truyền thừa quan, hắn là muốn giết ngươi!\" \n\n \"Đánh giết đối thủ, mới có thể đi vào truyền thừa quan?\" \n\n Diệp Nhiên run lên, mà lúc này, hắn đã giẫm ở đó bạch thạch sân thi đấu bên trên. \n\n Lập tức, sân thi đấu chung quanh hiện lên một mảnh thật dầy màn sáng. \n\n Đem toàn bộ sân thi đấu vây quanh. \n\n Cùng một thời gian, trên bầu trời hiện lên một nhóm chói mắt cực lớn ánh sáng chữ, biểu hiện là —— lượt này sinh tử thi đấu bắt đầu (một bên chết vong, một phương khác có thể xuống đài). \n\n \"Ha ha ha!\" \n\n Thần Minh Tộc  tóc bạc người trẻ tuổi cuồng tiếu lên tiếng, tiếp theo sâm nhiên nhìn một chút cách đó không xa thanh người thằn lằn, \"Chết thằn lằn, suýt chút nữa bị ngươi hư mất chuyện tốt của ta, sau này cho ta cẩn thận một chút!\" \n\n Nói xong, nó đồng dạng bay trên không bay về phía sân thi đấu. \n\n Này lúc bên cạnh cái kia tướng mạo kiều tiếu nữ Thần Minh Tộc, một phát bắt được cánh tay kia, nhu tình đưa tình nói:\"Minh hoàng ca, cái này số tám có thể hay không để cho cho ta? \n\n Ngươi thực lực mạnh như vậy, coi như cùng những người khác chiến đấu, phần thắng cũng rất lớn, ta cũng không giống nhau...\" \n\n Ầm! \n\n Tóc bạc người trẻ tuổi một cái hất ra nàng ngọc thủ, cười lạnh nói: \"Biết mình yếu, liền đi thành thành thật thật tu luyện!\" \n\n Nữ Thần Minh Tộc gương mặt xinh đẹp khó coi, cái này hỗn đản, khó trách một mực tìm không thấy tu hành bạn lữ. \n\n Tóc bạc người trẻ tuổi mặt lộ vẻ đắc ý, bay về phía trên không  bạch thạch sân thi đấu. \n\n Chung quanh những thiên tài khác nhao nhao nhìn lại. \n\n Còn có người hâm mộ nói: \"Này lần nhường minh hoàng cho nhặt được một cái lỗ hổng, này số tám, sợ là một cái tát liền có thể chụp chết a?\" \n\n \"Chúng ta thực lực không sai biệt nhiều, không ai dám chủ động đi lên, một mực hao tổn đến bây giờ, không nghĩ tới sớm nhất đi vào lại là minh hoàng.\" \n\n \"Chủ yếu số tám này dạng  lăng đầu thanh không có mấy cái, quy tắc cũng không nhìn, này mới bị minh hoàng nhặt được tiện nghi.\" \n\n \"Ta thực sự không có kiên nhẫn, chờ này một vòng kết thúc, liền chủ động đi lên, đến lúc đó ngẫu nhiên chọn lựa đối thủ cũng không cái gọi là, ngược lại phải mau chóng tiến truyền thừa quan...\" \n\n Từng cái tuổi trẻ thiên tài nghị luận. \n\n Thanh người thằn lằn thì than khẩu khí, già lưỡi đao cha, không phải ta không có nhắc nhở ngươi, là ngươi quá gấp rồi. \n\n Đáng tiếc, ta còn không có đoạt lại hoang thú túi, càng không có đánh ngươi đây. \n\n \"Ngươi tiểu tử vận khí l�� thực sự không tốt, ta đánh ngươi một chầu, cũng sẽ không đòi mạng ngươi, bây giờ...\" \n\n Ầm! \n\n Lúc này, giữa không trung vang lên một đạo tiếng nổ kịch liệt, tóc bạc người trẻ tuổi bay ngược rơi xuống. \n\n Hắn lảo đảo sau khi hạ xuống, ngửa mặt lên trời kinh sợ hô to: \"Kim lệ tê, ngươi muốn cùng ta cướp đối thủ, quy tắc cho phép sao?\" \n\n \"Ha ha, đầu nào quy tắc nói không thể cướp đối thủ?\" \n\n Trên không truyền đến cười to một tiếng, là một cái mặt ưng thân người  nam tử, sau lưng một đôi Kim Sí bày ra, phát ra chói mắt kim quang. \n\n Lúc này giọng mỉa mai mà liếc một cái phía dưới, \"Chỉ có lên đài về sau, trừ phi đánh giết đối thủ không phải vậy không cách nào rời đi quy tắc, cùng chỉ cần có trên một người đài, nửa ngày bên trong không tới người khiêu chiến. \n\n Liền sẽ ngẫu nhiên tuyển một người này hai đầu quy tắc, lại không quy định không thể cướp đối thủ? \n\n Muốn trách, thì trách chính ngươi ngu xuẩn, không biết đề phòng, ha ha ha, cái này số tám là của ta, ngươi cùng đó mấy cái khó dây dưa gia hỏa đi liều mạng đi!\" \n\n Kim lệ tê hai cánh xoay mình chống ra, hóa thành một vệt kim quang, trong nháy mắt liền rơi xuống bạch ngọc trong sân đấu. \n\n Lập tức, sân thi đấu hiện lên một nhóm ánh sáng chữ. \n\n —— Số tám đối với số sáu, vượt qua ba ngày không có đánh giết đối thủ, cả hai sắp hết bị tru sát! \n\n \"Đáng chết!\" \n\n \"Này gia hỏa động tác thật nhanh!\" \n\n \"Đáng giận...\" \n\n Thấy thế, từng đạo không cam lòng âm thanh vang lên, mười cái đã bay đến giữa không trung các tộc thiên tài, nổi giận đùng đùng rơi xuống. \n\n Vẫn là chậm bước, không có đoạt lấy kim lệ tê gia hỏa này! \n\n \"Hừ, còn nghĩ cùng ta cướp?\" \n\n Kim lệ tê cười lạnh một tiếng, nhìn về phía phía trước kiêu căng nói:\"Số tám, có thể chết ở thủ hạ của ta, cũng coi như là vinh hạnh của ngươi!\" \n\n Ra ngoài ý định, không nghe thấy trong tưởng tượng hoảng sợ cầu xin tha thứ, ngược lại một đạo ánh mắt âm lãnh trông lại. \n\n \"Thế mà không sợ?\" \n\n Kim lệ tê sửng sốt một chút, liền thấy đó trên mặt một đoàn hắc vụ  thiếu niên áo tím, ánh mắt phá lệ âm trầm, theo dõi hắn nói. \n\n \"Làm hỏng việc của ta đúng không? Một cái bốn mươi ba đoạn  Thần Minh Tộc thiên tài, ít nhất cũng là tam Tinh Khiếu, trên người Tinh Khải Chi Nhãn hơn phân nửa là trụ cấp. \n\n Ngươi đem hắn cho ta đẩy xuống đi, ta còn thế nào cầm tới hắn  Tinh Khải Chi Nhãn?\""},{"num":1058,"id":"7622790","rawTitle":"phá thần mâu","title":"PHÁ THẦN MÂU","content":"Bạch thạch sân thi đấu bên trên, kim lệ tê thần sắc ngạc nhiên, Tinh Khải Chi Nhãn, đó một kiện Thần Minh Tộc  truyền thừa kỳ vật? \n\n Này số tám lại là cố ý đi lên! \n\n Mục đích, là muốn đánh giết minh hoàng cướp đi Tinh Khải Chi Nhãn. \n\n Phía dưới những thiên tài khác cũng kinh ngạc vô cùng, vô ý thức nhìn về phía minh hoàng, nói như vậy, vẫn là đối phương vận khí tốt lưu lại cái mạng? \n\n Không đúng, bọn họ vội vàng trong lòng lắc đầu, này đều nghĩ đến đi nơi nào. \n\n Này cái số tám chỉ là Tinh tướng, cùng minh hoàng kém cách xa vạn dặm, đừng nói giết, sống sót cũng khó khăn. \n\n \"Phô trương thanh thế!\" \n\n Kim lệ tê thân hình bỗng nhiên mãnh liệt bắn mà ra, trong sân đấu, thoáng qua một đạo kim sắc tàn ảnh, thoáng qua tập (kích) đến phụ cận. \n\n Hắn kịch liệt ưng trảo mang theo cuồng bạo tinh lực, bỗng nhiên vồ xuống, cười gằn nói: \"Lên đường đi!\" \n\n Phía dưới  những thiên tài khác nhóm, đều lắc đầu, nhao nhao một lần nữa ngồi trở lại tại chỗ, đã không có nhìn lại tâm tư. \n\n Nhưng mà tiếp theo một cái chớp mắt. \n\n Ầm! \n\n Một đạo thanh thúy sụp đổ tiếng vang lên, một cái đầu lâu nổ tung. \n\n Diệp Nhiên mặt không biểu tình, xoa xoa máu trên tay, trước người bịch một tiếng, một cỗ thi thể không đầu ngã xuống đất. \n\n Lập tức, phía dưới các tộc thiên tài đột nhiên đứng lên. \n\n Ý niệm lực dò xét kim lệ tê  thi thể về sau, diệp đốt sắc mặt dừng lại. \n\n Vẫn được, có ba kiện trụ cấp kỳ vật. \n\n Mặc dù không được đến Tinh Khải Chi Nhãn, nhưng cũng có thể tiếp nhận đi. \n\n Kim lệ tê cũng là hơn bốn mươi đoạn thực lực, tam Tinh Khiếu, loại này thiên tài tại kim lệ Ưng tộc bên trong, cũng không nhiều, trên người có ba kiện trụ cấp kỳ vật bình thường. \n\n Đương nhiên, vẫn là phía dưới đó cái Thần Minh Tộc  càng đáng giá tiền. \n\n \"Đáng tiếc.\" \n\n Diệp Nhiên lắc đầu, vốn là muốn làm một hai tay chuẩn bị, trước tiên làm một cái trụ cấp  Tinh Khải Chi Nhãn dự bị, đến lúc đó không chiếm được Vũ cấp  có thể luyện hóa lại trụ cấp. \n\n Nhưng bây giờ, bị này gia hỏa phá hủy. \n\n Lần sau còn muốn gặp phải này minh hoàng loại này cấp bậc Thần Minh Tộc, liền không dễ dàng. \n\n Này lần tiến truyền thừa mà  Thần Minh Tộc thiên tài, mạnh nhất , chỉ có tam Tinh Khiếu, chính là cái này minh hoàng. \n\n Đến nỗi Thần Linh Tộc, cũng không phải là người người cũng có Tinh Khải Chi Nhãn. \n\n Cổ quyền nói qua, xem như đệ nhất cường tộc, nội tình thâm hậu, Tinh Khải Chi Nhãn tương tự mắt loại truyền thừa kỳ vật khoảng chừng hai cái. \n\n Bởi vậy Thần Linh Tộc thiên tài, lựa chọn Tinh Khải Chi Nhãn  khả năng chỉ có một nửa. \n\n Lúc này, bạch thạch sân thi đấu ánh sáng xung quanh màn tiêu thất. \n\n Diệp Nhiên trong lòng hơi có vẻ tiếc nuối, rời đi sân thi đấu, hướng đi phía dưới. \n\n Phía dưới, lặng ngắt như tờ. \n\n Tất cả tuổi trẻ thiên tài há to mồm, không ít người còn dụi dụi con mắt, hoài nghi mình có phải hay không xuất hiện ảo giác. \n\n Chết! \n\n Kim lệ tê bị một chiêu thuấn sát rồi. \n\n Không đúng, thậm chí không tính là một chiêu, một chút liền bóp chết ! \n\n Giống như là bóp chết con kiến như thế đơn giản. \n\n Mọi người thấy trống rỗng, hoàn toàn tĩnh mịch  bạch thạch sân thi đấu, biểu lộ gian khổ, nuốt nước miếng một cái. \n\n Thật là đáng sợ... \n\n Một điểm tinh lực ba động đều không bộc phát, này đại biểu chênh lệch lớn đến khó có thể tưởng tượng! \n\n \"Kim lệ tê, ngươi có phải hay không đang giả chết?\" \n\n Một cái xấu xí  thương Dực Tộc tuổi trẻ thiên tài, nhịn không được hướng về bầu trời hô. \n\n Nghe vậy, giữa sân tất cả mọi người sửng sốt một chút. \n\n Bên cạnh một cái đồng dạng thương Dực Tộc, nhịn không được mắng: \"Ngươi có phải là ngốc hay không rồi? hắn cũng không phải có khuyết điểm, giả chết cái rắm a!\" \n\n Những thiên tài khác cũng đều biểu lộ cổ quái, nhưng tỉ mỉ nghĩ lại, lại có thể lý giải. \n\n Đến bọn họ loại thực lực này, muốn phân ra thắng bại cũng không dễ dàng, cần thời gian không ngắn. \n\n Cho dù thực lực xê xích nhiều, chỉ cần bộc phát chiến đấu, coi như kết thúc phải lại nhanh, nhất định sẽ có không nhỏ động tĩnh. \n\n Nhưng giống như bây giờ một điểm gợn sóng cũng không có... \n\n Diệp Nhiên chậm rãi đi tới, chung quanh thiên tài nhao nhao sắc mặt hoàn toàn thay đổi, đồng loạt lui ra phía sau tránh ra. \n\n Có chút trông mà thèm xem một cái đó cái Thần Minh Tộc  minh hoàng, diệp đốt trong lòng càng tiếc hận, chỉ thiếu chút nữa a. \n\n Minh hoàng hai chân có chút như nhũn ra, bối rối trốn đến trước đây nữ Thần Minh Tộc sau lưng, hoảng sợ nói. \n\n \"Xong rồi, ngươi thấy không, cái này số tám xem ta ánh mắt rất tham lam, hắn tựa như là vừa ý ta !\" \n\n \"Xéo đi!\" \n\n Nữ Thần Minh Tộc nổi giận đùng đùng hất tay của hắn ra cánh tay, cười khẩy nói: \"Ngươi suy nghĩ nhiều, người ta cũng không phải coi trọng ngươi rồi, mà là coi trọng ngươi  thi thể.\" \n\n Tóc bạc người trẻ tuổi biểu lộ cứng đờ, trong lòng càng sợ hãi. \n\n Diệp Nhiên đi đến thanh người thằn lằn trước mặt, hắn đối với này thanh người thằn lằn, vẫn còn có chút hảo cảm. \n\n Đối phương tại khí vận chi lâm bên trong, đưa qua hắn một lần đồ tốt không nói. \n\n Vừa mới còn nhắc nhở hắn, có ơn tất báo rất không tệ. \n\n \"Ngươi run rẩy cái gì?\" \n\n Diệp Nhiên có chút ngoài ý muốn, nhìn xem trước mặt run rẩy không ngừng thanh người thằn lằn. \n\n \"Không, không có gì...\" \n\n Thanh người thằn lằn trên mặt lộ ra so với khóc còn khó coi hơn  cười, \"Ta. . . Ta không nghĩ tới đánh ngươi, hoang thú túi cũng là cam tâm tình nguyện tặng cho ngươi.\" \n\n\"Ừm?\" \n\n Diệp Nhiên tròng mắt hơi híp, có chút bất thiện nói: \"Ngươi đang nói cái gì?\" \n\n \"Không có gì, cái kia ngươi đột phá Tinh Quan rồi?\" thanh người thằn lằn cuống quít dịch ra chủ đề. \n\n Những thiên tài khác cũng cả gan, nghiêng tai nghe. \n\n Này cái số tám trở nên mạnh mẽ quá khoa trương. \n\n Đâu chỉ là Tinh Quan, nếu không phải là này bên trong Tinh Vương vào không được, bọn họ cũng hoài nghi đối phương, có phải hay không đều đột phá Tinh Vương rồi. \n\n Một phen trò chuyện phía sau. \n\n Diệp Nhiên cũng đại khái đem tình huống giải thất thất bát bát. \n\n Muốn tiến vào bát đại truyền thừa quan, nhất định phải tại sinh tử sân thi đấu, đánh giết một cái truyền thừa giả mới được. \n\n Này cũng là vì cái gì, phía trước mỗi một quan mang đi  tài nguyên cũng có hạn mức cao nhất. \n\n Chính là muốn cam đoan thật nhiều người thông quan. \n\n Cuối cùng ở nơi này sinh tử sân thi đấu, tự giết lẫn nhau. \n\n Nghĩ tới đây, diệp đốt khẽ lắc đầu, Thập Thần thiên tử ác độc, phía trước tại cơ sở quan lúc, quy tắc chính là đánh giết cái khác truyền thừa giả, có thể lại càng dễ dẫn xuất tài nguyên. \n\n Nhưng tiến truyền thừa mà những thiên tài này, đều không ngốc, cho nên một mực tại tận lực tránh giao phong. \n\n Chỉ là không nghĩ tới, đi tới sau cùng truyền thừa quan. \n\n Vẫn có này sao cái sinh tử sân thi đấu tại. \n\n \"Trên bảng hết thảy hơn ba mươi tiến truyền thừa đóng, chứng minh đã chết đi hơn ba mươi thiên tài.\" \n\n Diệp Nhiên nhìn một chút đó tờ danh sách, trong lòng ngưng lại. \n\n Này chút chết, đều không phải kẻ yếu, ít nhất cũng có tiếp cận ba mươi đoạn thực lực. \n\n Mà bởi vì chỉ cần có người bên trên sân thi đấu về sau, chờ nửa ngày, không có người khiêu chiến, liền sẽ ngẫu nhiên cưỡng ép chọn một. \n\n Dẫn đến một chút yếu cũng rời đi, lưu lại  cũng là tinh anh, giống như giữa sân những này ít nhất cũng có hơn ba mươi đoạn thực lực. \n\n Mạnh chút , thậm chí có hơn bốn mươi đoạn thực lực. \n\n Bất quá bởi vì ai cũng không muốn bên trên sân thi đấu về sau, gặp phải một tên kình địch, sinh tử tương bác, mới chậm chạp không có người ra sân. \n\n Dù sao khổ chiến phía sau thắng còn tốt. \n\n Như thua... \n\n \"Như vậy nhìn tới, này một số người còn muốn giằng co một đoạn thời gian.\" \n\n Diệp Nhiên quét mắt một vòng đó chút các tộc thiên tài, không nghĩ nhiều nữa, hướng đi bát đại truyền thừa quan, đồng thời suy tư thực lực bây giờ của mình. \n\n Rời đi Tinh Thiên Linh Cảnh về sau, cũng là thành công cảm giác được khác Tinh Quan thiên tài. \n\n Cao thủ đỉnh phong bên trên xếp hạng đạt đến đệ nhất, xưng hào kích hoạt, lại đề thăng 20%  tăng phúc, tăng thêm hơn sáu triệu tinh lực. \n\n Hắn  cuối cùng tinh lực, cũng triệt để phá trăm triệu. \n\n Xem như một cái trăm đoạn Tinh Quan, mười đoạn Tinh Vương, mà mười đoạn Tinh Vương cũng là đại Tinh Vương  tiêu chuẩn. \n\n Trước mắt, tám phiến thanh đồng cửa lớn đặt song song. \n\n Phía trên đều là khắc hoạ lấy khác biệt  đồ án, có binh khí, có khổng lồ  cánh, còn có đang luyện quyền cự nhân. \n\n Diệp Nhiên từng việc đảo qua, cuối cùng ánh mắt, rơi xuống trong đó đệ tứ cánh cửa bên trên. \n\n Phía trên kia, là một thanh cực lớn  mâu. \n\n \"Phá thần mâu?\" \n\n Hắn nhìn xem môn thượng  chữ, tự nói một tiếng, cất bước đi vào. \n\n Theo đó đạo thiếu niên bóng lưng tiêu thất, hậu phương, còn lại  hơn năm mươi một thiên tài cũng là thở phào. \n\n Có người thấp giọng nói: \"Này cái số tám, đoán chừng cùng Thần Vô Hành bọn họ ba cái thực lực, đều chênh lệch không nhiều rồi.\" \n\n \"Vừa đột phá Tinh Quan mà thôi, quả thực là cái quái thai...\""},{"num":1059,"id":"7622791","rawTitle":"luyện chế","title":"LUYỆN CHẾ","content":"Bạch thạch sân thi đấu phía dưới. \n\n Một đám các tộc thiên tài bên trong, thanh người thằn lằn nhìn một chút đỉnh đầu, trong lòng thẳng thở dài, bị kẹt ở nơi này truyền thừa quan ngoại rồi. \n\n Cũng không phải sợ chết, mà là thực lực của hắn, chỉ cần đi lên chính là chịu chết. \n\n Này bên trong hơn bốn mươi đoạn  thiên tài, còn có bảy tám cái. \n\n Đều tại tùy thời mà động, chờ lấy bọn hắn những này hơn ba mươi đoạn  đi lên trước, tiếp đó ổn thỏa đánh giết. \n\n \"Lần này, làm như thế nào cầm tới món đồ kia?\" \n\n Thanh người thằn lằn mặt lộ vẻ ưu sầu, bây giờ có thể nói là cái tử cục, không nổi sân thi đấu, vào không được truyền thừa quan. \n\n Nhưng vừa lên sân thi đấu, lấy tự mình thực lực chắc chắn phải chết, chết càng cầm không trở về món đồ kia. \n\n Trừ phi... \n\n Hắn bỗng nhiên nhìn về phía đó tám phiến thanh đồng cửa lớn, màu vàng nâu mắt dọc lấp lóe một chút \n\n Trừ phi có người có thể giúp mình mang ra. \n\n \"Nhưng tìm ai đây...\" \n\n... \n\n Một mảnh bát ngát xích hồng kim loại đại địa bên trên, từng đạo khe rãnh ngang dọc, trong không khí, ẩn ẩn hiện ra khí tức nóng bỏng. \n\n Diệp Nhiên sau khi dừng lại, hơi kinh ngạc xem một cái mặt đất, này tựa như là khỏa cổ quáng tinh. \n\n Là một loại gọi hỏa vân sắt  tinh khoáng. \n\n Giá trị không coi là nhiều cao, cùng huyền sát khoáng thạch không sai biệt lắm. \n\n Nghĩ tới đây, hắn không khỏi xem xét một cái ý niệm không gian, bên trong huyền sát cổ quáng tinh sớm đã tiêu thất, phía trước tại Tinh Thiên Linh Cảnh bên trong thuận tiện thôn phệ. \n\n Nguyên một khỏa cổ quáng tinh thôn phệ, Huyền Sát Thần ánh sáng uy lực đi tới bảy trăm vạn. \n\n Diệp Nhiên trong lòng tính toán, tầng thứ nhất tu luyện, chung cần mười khỏa cổ quáng tinh, theo lí thuyết cuối cùng tinh lực là bảy ngàn vạn. \n\n Bảy ngàn vạn công kích tinh thuật, có thể nói tương đối đáng sợ. \n\n Hắn nhìn về phía phía trước, liền thấy một lớn bốn nhỏ, năm cái cường tráng hỏa trụ xa xa cao vút, lúc này hướng đó bên trong bước đi. \n\n Phút chốc. \n\n Năm cái thông thiên một dạng khổng lồ hỏa trụ, hiện lên ở trước mắt. \n\n Chính giữa nhất hỏa trụ bên cạnh, ngồi một cái mười mấy vạn mét cao màu xám đen cự nhân, người mặc áo giáp, khuôn mặt uy nghiêm, đỉnh đầu một đôi gảy lìa sừng rồng. \n\n Trên mặt hết thảy sáu con mắt, bất quá đều trống rỗng , chỉ còn lại hốc mắt. \n\n Mà phân tán ở chung quanh bốn cái hỏa trụ trước, nhưng là bốn cái tuổi trẻ thiên tài, một cái Thiên Ma Tộc  nam tử cao lớn, một cái Thần Linh Tộc nữ hài. \n\n Còn có hai cái hắc bào Uyên tộc người, nhìn không ra nam nữ. \n\n Lúc này bốn người, đều đang cuồn cuộn không ngừng thu phát tinh lực, duy trì lấy trước người Xích Hỏa trụ. \n\n Xích Hỏa trụ nội ẩn ẩn có thể nhìn thấy, một cây trường mâu màu bạc. \n\n Ầm! \n\n Theo một đạo tiếng nổ cực lớn lên, phía đông  hỏa trụ nổ tung, ngập trời hỏa diễm bao phủ hướng bốn phía, bên trong trường mâu màu bạc cũng đứt gãy. \n\n Nổ thành vô số mảnh vụn, bắn về phía tứ phương. \n\n Thiên Ma Tộc  nam tử cao lớn, tươi thắm bất động, tất cả hỏa diễm nhao nhao chủ động tránh đi hắn, nhưng lại thở dài. \n\n \"Lại thất bại.\" \n\n Hắn lắc đầu, một lần nữa tay khẽ vẫy, trước người mười mấy loại khác biệt  tinh khoáng bay lên. \n\n Phía trước cực lớn lỗ tròn trong động đất, cũng'Bịch' mà phun mạnh ra một đạo hoàn toàn mới  Xích Hỏa trụ, đột nhiên bao trùm những này tinh khoáng, chậm chạp hòa tan vào. \n\n Mặt khác ba phương hướng tuổi trẻ thiên tài, giống như là tập mãi thành thói quen, cũng không có qua quan tâm kỹ càng. \n\n Diệp Nhiên xa xa đánh giá, trong lòng kinh ngạc, này bốn cái truyền thừa giả, như thế nào giống như là tại luyện chế tinh binh? \n\n \"Phá thần mâu...\" \n\n Hắn trong lòng nghĩ ngợi, cất bước đến gần. \n\n Ở vào trung ương  màu xám đen cự nhân, tĩnh mịch đồng dạng ngồi ở tại chỗ, trước người đó căn lớn nhất Xích Hỏa trụ bên trong, rỗng tuếch. \n\n Bất quá bên người, hết thảy cắm mười mấy cây khổng lồ  sắc bén ngân mâu. \n\n \"Không phải tinh binh...\" \n\n Diệp Nhiên dò xét một cái, trong lòng khẽ nhúc nhích, bên trong ẩn chứa lực bộc phát lượng, cùng tinh binh tính chất hoàn toàn khác biệt. \n\n Tựa hồ đó loại một lần duy nhất đặc thù binh khí. \n\n Lúc này, trên bầu trời một khỏa huyết hồng mắt dọc chậm rãi rơi xuống, lạnh lùng liếc hắn một cái, \"Chỉ là một cái nguyên cấp huyết mạch, ngược lại là thật giỏi, nhường ngươi sống đến truyền thừa nhốt.\" \n\n \"Ngươi trên đầu Ăn-ten chảo đâu?\" diệp đốt hiếu kì hỏi. \n\n \"Dây anten?\" \n\n Huyết hồng mắt dọc cứng lại, hừ lạnh nói: \"Đừng kéo những thứ này, cho ngươi một cơ hội, ta thưởng ngươi 30% truyền thừa độ. \n\n Cái này 30% , có thể hối đoái một môn Vũ cấp tinh thuật, hoặc cấp chín  thập đại chiến y. \n\n Cầm tới bảo vật, liền ngoan ngoãn lui ra ngoài đừng vượt quan !\" \n\n \"Ngươi trên đầu Ăn-ten chảo đâu?\" diệp đốt tiếp tục hỏi. \n\n \"Cái gì dây anten?\" \n\n Huyết hồng mắt dọc thẹn quá hoá giận, \"Ngươi nói cái gì, ta nghe không hiểu, nhanh lên chọn lựa đồ vật, tiếp đó xéo đi!\" \n\n Nói, nó chợt bắn ra một đạo huyết quang. \n\n Huyết quang rơi vào giữa không trung, hiện lên một cái hư ảo màn sáng, bên trong là đủ loại tài nguyên. \n\n Ba kiện Vũ cấp kỳ vật, phân biệt đạt đến 40%, 60%, 80%  truyền thừa tiến độ có thể hối đoái, lại mỗi cái truyền thừa giả chỉ có thể lựa chọn một cái. \n\n Lại có là một chút những bảo vật khác, Vũ cấp tinh thuật một môn 30% truyền thừa tiến độ. \n\n Cấp bảy chiến y 10%, cấp tám chiến y 20%, cấp chín chiến y 30%... Hết thảy hơn ba mươi kiện vật phẩm. \n\n Huyết hồng mắt dọc chậm rãi nói: \"Đừng nói ta không cho ngươi cơ hội, chỉ là nguyên cấp huyết mạch, này truyền thừa quan nội , không phải ngươi có thể nhúng chàm . \n\n Các ngươi loại này cấp thấp huyết mạch, có thể đi vào, đã là ta mở một mặt lưới rồi.\" \n\n \"Ngươi trên đầu Ăn-ten chảo đâu?\" diệp đốt hỏi. \n\n \"Dây anten cái rắm!\" \n\n Huyết hồng mắt dọc giống như là bị đâm chọt chỗ đau, có chút phá phòng ngự mà gào thét, \"Ngươi có phải hay không chỉ có thể câu này? Cái gì phá thiên tuyến? Ta chính là phạm ngu xuẩn đeo, như thế nào!\" \n\n Nói xong, hắn nổi giận đùng đùng bay về phía đó tôn màu xám đen cự nhân. \n\n Tên tiểu tử khốn kiếp này, cái nào ấm không đề cập tới mở cái nào ấm, thực sự là có đủ đáng chết. \n\n Tuy khí đi đối phương, diệp đốt lại nhíu mày, vừa mới không nhìn lầm, trong màn sáng  Tinh Khải Chi Nhãn đã bị đổi. \n\n Mà hối đoái  truyền thừa giả, là số hai mươi lăm. \n\n \"Số hai mươi lăm...\" \n\n Hắn như có điều suy nghĩ, cái này số hai mươi lăm thật không đơn giản, phía trước liền nghe qua, sinh tử sân thi đấu bên trên, đối phương rút đến một cái Thần Linh Tộc xem như đối thủ. \n\n Có thể đó cái Thần Linh Tộc vừa mới lên đài, thế mà liền tự sát, có thể thấy được người phần không đơn giản. \n\n Mà cái kia số hai mươi lăm giống như hắn, cũng là trung cấp Tinh Quan. \n\n Diệp Nhiên bên cạnh suy tư, vừa đi tới đó tôn xám đen cự nhân trước, liếc nhìn một cái, chính là trong lòng run lên. \n\n Này lại là một cái đại Tinh Vương cấp  khôi lỗi! \n\n Lúc này, bốn người khác xem ra, nhìn thấy hắn lúc đều có chút ngoài ý muốn, rõ ràng không nghĩ tới mới tới lại là hắn. \n\n Nhưng đây chỉ là liếc nhìn một cái, lại riêng phần mình chuyên tâm luyện chế trường mâu màu bạc. \n\n \"Thông qua bản quan, có thể nhận được 15% —— 20% truyền thừa tiến độ; thông quan yêu cầu, luyện chế ra hoàn chỉnh phá thần mâu.\" \n\n Xám đen cự nhân thanh âm uy nghiêm, giống như Thiên Lôi cuồn cuộn giống như vang lên, tiếp theo hắn cự thủ vung lên, từng khối tinh khoáng bay đến Xích Hỏa trụ bên trong. \n\n Hắn lại chậm rãi đứng lên, thân hình khổng lồ ước chừng bốn trăm ngàn mét cao, gần như chạm đến bầu trời, so đó Xích Hỏa trụ còn cao hơn. \n\n Mà ở tại dưới thân, còn có vỗ một cái cực lớn thanh đồng cửa, rõ ràng là thông quan chi môn. \n\n Xám đen cự nhân đứng tại Xích Hỏa trụ trước, không ngừng tế luyện , rất nhanh, một cây cực lớn trường mâu từ hỏa trụ bên trong bay ra. \n\n Trường mâu ngân quang lấp lóe, khắc hoạ lấy mấy cái vặn vẹo kêu rên  Thần Linh Tộc đồ án, thẳng tắp cắm vào trong đất. \n\n Diệp Nhiên ý niệm lực cường hung hãn, quan sát nhập vi, cho dù dạng này, hắn vẫn cảm giác một lần có chút không thấy rõ, chỉ là nhớ kỹ trình tự. \n\n Mỗi cái trình tự  hỏa lực khống chế trình độ, thủ pháp luyện chế chờ một chút, vẫn phá lệ xa lạ. \n\n \"Vẫn rất khó khăn.\" \n\n Hắn nói thầm một tiếng, ngược lại là cũng không suy nghĩ nhiều, tìm kiếm một chỗ lỗ tròn địa động, kích phát ra bên trong Xích Hỏa trụ."},{"num":1060,"id":"7622792","rawTitle":"bởi vì ta nỗ lực a","title":"BỞI VÌ TA NỖ LỰC A","content":"Bạch! \n\n Mãnh liệt Xích Hỏa trụ, nháy mắt phóng lên trời, sáng rực sóng nhiệt đâm đầu vào đánh tới. \n\n Diệp Nhiên toàn thân bị ánh lửa chiếu rọi đỏ bừng, hắn tinh lực chấn động, Xích Hỏa trụ trước, bày ra phải chỉnh chỉnh tề tề  một đống tinh khoáng, đều rơi vào hỏa trụ bên trong. \n\n Tiếp theo, hắn cũng học xám đen cự nhân  động tác, bắt đầu luyện chế phá thần mâu. \n\n Mặt khác bốn cái thiên tài thấy thế cũng là sửng sốt một chút. \n\n Thiên Ma Tộc  nam tử cao lớn, là trước kia  ma tàu chạy đường sông, lúc này cau mày nói: \"Truyền thừa khôi lỗi như thế nào chỉ dạy một lần?\" \n\n Một cái Uyên tộc thiên tài cũng khàn khàn nói:\"Chính xác không thích hợp, phía trước dạy cho chúng ta lúc, cũng là ba lần.\" \n\n \"Ba lần hẳn là tình huống bình thường, trước mấy ngày rời đi cổ tổ cũng là ba lần.\" \n\n \"Đó như thế nào đến phiên số tám...\" \n\n\"Được rồi, Cùng chúng ta không quan hệ, vừa vặn còn có thể thiếu một cái đối thủ cạnh tranh.\" \n\n Bốn người truyền âm xong, lại tiếp tục nhắm mắt chuyên tâm luyện chế. \n\n Này phá thần mâu luyện chế có chút rườm rà, chỉ truyền dạy ba lần, cho dù là thiên phú của bọn hắn, cũng có phần khó lý giải. \n\n Cần không ngừng nếm thử, tự mình đi tìm tòi. \n\n Đến nỗi một lần, kia liền càng... \n\n Xám đen cự nhân đỉnh đầu, huyết hồng mắt dọc nhìn qua xa xa hắc vụ thiếu niên, trong mắt lóe lên vẻ lạnh lùng. \n\n Thật nếu để cho cái nguyên cấp huyết mạch nhận được truyền thừa, ta mặt mũi cũng không có! \n\n Cho nên này ma viêm tay mảnh vụn, người khác cũng có thể cầm, coi như ta buồn nôn nhất  Thần Linh Tộc đều được, nhưng duy chỉ có ngươi không được! \n\n \"Chỉ truyền dạy một lần, ngươi từ từ ở nơi này một quan mắc kẹt đi!\" \n\n Huyết hồng mắt dọc trong lòng cười lạnh, nhắm mắt lại. \n\n Nơi xa. \n\n Diệp Nhiên đem tất cả tinh khoáng, chậm rãi luyện hóa, bởi vì cấp năm ý niệm không gian  nguyên nhân, hắn lực khống chế rất mạnh. \n\n Lúc này những này tinh khoáng có  hòa tan thành một bãi chất lỏng, có  biến mềm uốn lượn. \n\n \"Hỏa lực có chút lớn.\" \n\n Chú ý tới một khối màu tím tinh khoáng bị sấy khô thành hơi, diệp đốt trong lòng căng thẳng, vội vàng triệt tiêu bộ phận tinh lực, khiến cho hỏa trụ biến ảm đạm chút. \n\n Nhưng chợt, lại có một khối đang tại hòa tan thanh đồng khoáng ngừng tan rã. \n\n Này chút tinh khoáng điểm nóng chảy hoàn toàn không nhất trí. \n\n \"Thật đúng là phiền phức.\" \n\n Hắn trong lòng lắc đầu, liền này cơ sở nhất  bước đầu tiên hỏa lực chưởng khống, đều khá khó khăn. \n\n Này lần xem như thất bại, chỉ có thể lần nữa tới rồi. \n\n Tiếp xuống, lại thay thế tinh khoáng tiếp tục hai ba lần luyện chế về sau, mặc dù đều thất bại, nhưng tăng trưởng không thiếu kinh nghiệm. \n\n Đang lúc diệp đốt muốn tiến hành lần thứ tư lúc, hắn bỗng nhiên nghĩ đến cái gì, mở ra bảng, tại thôi diễn cái nút bên trên tìm kiếm, rất nhanh ánh mắt sáng lên. \n\n 【 Phá thần mâu Rèn thuật (có thể thôi diễn): Nhập môn, cơ sở, tinh thâm... Phân biệt tiêu hao một ngàn, một vạn, ba vạn thành tựu điểm. 】 \n\n \"Trước tiên tiêu hao một ngàn thử xem.\" \n\n Diệp Nhiên nghĩ xong, tiêu hao hết thành tựu điểm, lập tức trong đầu tràn vào một đống tin tức. \n\n Tiếp theo hắn một lần nữa khởi động Xích Hỏa trụ, đưa lên tinh khoáng, lần này, thông thạo khác thường, rất nhanh liền kết thúc luyện chế. \n\n Đồng thời theo ông một tiếng. \n\n Một cây ngân mâu bỗng nhiên từ đó bay ra, cắm trên mặt đất, mâu đuôi tỏa ra dài ngàn mét  quang diễm. \n\n Nghe được động tĩnh, khác bốn đạo ánh mắt cùng nhau trông lại. \n\n Ma tàu chạy đường sông mấy người bốn cái tuổi trẻ thiên tài, thần sắc kinh ngạc, dừng lại trong tay động tác, ngây ngốc mà nhìn xem đó cán ngân mâu. \n\n Ngàn mét quang diễm, đây là. . . Nhập môn? \n\n Vừa mới khép kín không lâu huyết hồng mắt dọc cũng mở ra, không kiên nhẫn nhìn ra phía ngoài, tiếp theo trừng lớn mắt. \n\n Cmn, gặp quỷ! \n\n \"Tiểu tử, ngươi trước đó học qua?\" Nó nhịn không được âm thanh hô. \n\n \"Không có.\" \n\n Diệp Nhiên lắc đầu, có chút hưng phấn mà cánh tay một chiêu, đem tự mình luyện chế ra ngân mâu chộp tới, nhẹ nhàng huy động mấy lần. \n\n Giữa không trung lập tức lưu lại mấy đạo ngân ngấn, chói mắt vô cùng. \n\n \"Không có học qua, ngươi nhập môn phải nhanh như vậy?\" \n\n \"Thêm điểm là được... Ách không phải, ta đối với này rất cảm thấy hứng thú.\" \n\n Diệp Nhiên thật thà nói: \"Hứng thú chính là tốt nhất lão sư, đương nhiên, cùng ta  cố gắng cũng không thoát được quan hệ.\" \n\n \"Cố gắng ngươi đại gia a!\" \n\n Ma tàu chạy đường sông bốn người khuôn mặt đều tái rồi, mẹ nó ngươi ngồi xuống mới mười mấy phút, cái mông đều không ngộ nóng a? \n\n Ngươi này nếu là cố gắng, vậy chúng ta tính là gì? \n\n Huyết hồng mắt dọc cũng là một mặt ăn phân  biệt khuất biểu lộ, giọng căm hận nói: \"Tính ngươi đi, bất quá vừa vặn nhập môn mà thôi, mấy người đạt đến cơ sở trình độ, mới có thể qua ải.\" \n\n \"Khó trách.\" \n\n Diệp Nhiên trong lòng có chút tiếc nuối, đã sớm biết, không có dễ dàng như vậy, không phải vậy cái kia bốn cái thiên tài sẽ không còn lưu tại nơi này. \n\n Hắn vừa mới dành thời gian liếc qua, này bốn người cũng đã có thể luyện chế ra cấp độ nhập môn  phá thần mâu. \n\n Đều tại theo đuổi cao hơn trình độ, chỉ là không thể thành công. \n\n Ma tàu chạy đường sông nhìn về phía diệp đốt, do dự phía dưới hỏi: \"Số tám, ngươi trước đó thật không có học qua?\" \n\n \"Hừ, này phá thần mâu không có truyền ra ngoài qua.\" \n\n Nói chuyện chính là huyết hồng mắt dọc, lạnh lùng nói: \"Biết phương pháp luyện chế , chỉ có ta này một bộ phận tàn niệm, cái khác trong thân thể  tàn niệm cũng không bi��t được.\" \n\n Nó suy nghĩ tỉ mỉ về sau, xác định không có tiết lộ ra ngoài. \n\n Diệp Nhiên trong mắt lóe lên mấy phần khác thường, nguyên lai này huyết nhãn, là Thập Thần thiên tử  tàn niệm. \n\n Ma tàu chạy đường sông bốn người truyền âm trò chuyện, \"Xem ra này số tám thật không có học qua, này là lần đầu tiên học.\" \n\n \"Vậy hắn như thế nào học nhanh như vậy? Không hợp lý a.\" \n\n \"Không sai, truyền thừa khôi lỗi còn chỉ dạy hắn một lần, có thể nhớ kỹ tất cả chi tiết trình tự đã tính toán không sai, thế mà này sao nhanh nhập môn, ngộ tính đáng sợ như thế sao?\" \n\n \"Chúng ta trước đây dùng thời gian bao lâu nhập môn?\" \n\n \"Nhập môn khó khăn nhất, chúng ta đều dùng khoảng ba tháng đi, sau đó chính là ở đây không ngừng tăng lên độ thuần thục.\" \n\n \"Ba tháng, hắn dùng bao lâu?\" \n\n \"Mười bảy phút...\" \n\n\"Đúng rồi, các ngươi dùng thời gian bao lâu nhập môn?\" Lúc này, diệp đốt hiếu kì nhìn về phía ma tàu chạy đường sông bọn hắn. \n\n Bốn người đang tại lẫn nhau truyền âm, lập tức biểu lộ cứng đờ. \n\n \"Cùng ngươi... Không kém bao nhiêu đâu.\" \n\n Một cái Uyên tộc thiên tài oang oang, nói hàm hồ không rõ: \"Cụ thể thời gian bao lâu không nhớ rõ, nhưng phải cùng ngươi dùng  chênh lệch thời gian không nhiều.\" \n\n \"Đúng đúng, nhớ không rõ thời gian, đoán chừng cùng ngươi không sai biệt nhiều.\" Ba người khác cũng lúng túng đáp lại. \n\n Xa xa huyết hồng mắt dọc thấy thế, xa xa giễu cợt một tiếng, \"Không biết xấu hổ!\" \n\n Nói xong tiếp tục nhắm mắt ngủ đông. \n\n Diệp Nhiên tắc thì trong lòng hơi rét, nhìn không ra, này có chút lớn tộc thiên tài ngộ tính cao như vậy. \n\n Hắn đối với mình ngộ tính đã rất tự tin, dù sao đi qua bảng mấy lần đề thăng, không hề kém, nhưng cảm giác muốn dựa vào chính mình nhập môn. \n\n Cũng phải một hai tháng. \n\n Mà những người này, thế mà dùng thời gian ngắn như vậy... \n\n \"Quả nhiên, không thể coi thường người khác.\" \n\n Diệp Nhiên chấn tác tinh thần, tiếp tục nhắm mắt, chuẩn bị bắt đầu thêm điểm, đối với mấy cái này người cạnh tranh tôn trọng một chút. \n\n Nhưng tiếp theo hắn nghĩ đến cái gì, chần chờ phía dưới lắc đầu. \n\n Được rồi, cảm giác sau khi nhập môn, lại đề thăng đến cơ sở trình độ, chỉ cần một mực không ngừng thử lỗi, tích lũy kinh nghiệm là được. \n\n Chín ngàn thành tựu điểm cũng không ít rồi, không cần thiết lãng phí ở phía trên này. \n\n Bây giờ trên thân còn lại không sai biệt lắm 180 ngàn  thành tựu điểm, lại góp nhặt mười hai vạn, bảng liền có thể thăng cấp. \n\n Bảng sau khi thăng cấp chuyển hóa công năng mới là trọng yếu nhất. \n\n \"Vừa vặn thừa dịp trong khoảng thời gian này, luyện hóa Tinh Văn Thiết.\" \n\n Diệp Nhiên vung tay lên, quanh thân rơi xuống một đống Tinh Văn Thiết, một bên luyện hóa Tinh Văn Thiết, vừa tiếp tục luyện chế phá thần mâu. \n\n Xích Hỏa trụ phía trước trưng bày đủ loại tinh khoáng, lấy tốc độ mà mắt thường cũng có thể thấy được cấp tốc tiêu thất."},{"num":1061,"id":"7622793","rawTitle":"ba vạn mét quang diễm","title":"BA VẠN MÉT QUANG DIỄM","content":"Một tháng thời gian đảo mắt đã qua. \n\n Xích Hỏa trụ trước, diệp đốt ngồi xếp bằng, chung quanh là chồng chất như núi Phế Khí Tinh Văn Thiết, cùng với từng cây gảy lìa ngân mâu. \n\n Ước chừng mấy ngàn số, lít nha lít nhít cắm lập tinh văn thiết sơn bên trên, hỗn loạn vô tự. \n\n Cũng là trong khoảng thời gian này, luyện chế thất bại sản phẩm. \n\n \"Không có tinh mỏ?\" \n\n Hắn nhìn một chút trống rỗng mặt đất, có chút ngoài ý muốn, không nghĩ tới luyện chế thời gian dài như vậy, đem tinh khoáng đều hết sạch. \n\n Ánh mắt liếc nhìn, liền thấy đó cái gọi ma tàu chạy đường sông  Thiên Ma Tộc, cùng một cái Thần Linh Tộc  nữ tử tóc lam, đang tại xám đen cự nhân chỗ nhận lấy tinh khoáng. \n\n Thế là cũng khởi hành đi qua. \n\n Ma tàu chạy đường sông là Thiên Ma Tộc tới đây cái thứ hai Tứ Tinh Khiếu, bởi vậy ấn tượng rất sâu. \n\n Xám đen cự nhân thân thể khổng lồ, cho dù là ngồi ở chỗ đó, cũng có ước chừng mười mấy vạn mét cao, không thể nhìn thấy phần cuối. \n\n Ma tàu chạy đường sông cùng tóc lam nữ Thần Linh Tộc, hai người đều cầm lấy một cái không gian giới chỉ rời đi. \n\n Diệp Nhiên đi tới gần, đó xám đen cự nhân mặt không biểu tình, chậm rãi nâng lên cự thủ, lập tức một đống tinh khoáng như mưa rơi xuống. \n\n Toàn bộ là luyện chế phá thần mâu  tài liệu, có chút hắn đều nhận không ra. \n\n Hắn đem những này tinh khoáng thu hồi, quay người rời đi. \n\n Mà ma tàu chạy đường sông cùng Thần Linh Tộc nữ tử quay đầu lúc, vừa hay nhìn thấy một màn này, hai mặt nhìn nhau, đều là nhìn thấy trong mắt đối phương kinh ngạc. \n\n \"Truyền thừa khôi lỗi cho số tám  tinh khoáng phẩm chất, tựa hồ so với chúng ta  kém rất nhiều.\" \n\n \"Chính xác so với chúng ta kém, như vậy, số tám nghĩ thông suốt quan, liền cần dùng nhiều thời gian hơn rồi.\" \n\n Tóc lam nữ Thần Linh Tộc trong mắt lóe lên vẻ vui mừng, \"Khỏi phải nói tỉnh hắn, đi thôi.\" \n\n Ma tàu chạy đường sông chần chờ dưới, gật gật đầu, tiếp theo lại nhìn một chút xám đen cự nhân đỉnh đầu ngủ say  huyết hồng mắt dọc, trong lòng lắc đầu. \n\n Này số tám, cũng không rõ ràng như thế nào đắc tội này huyết nhãn rồi, bị nhiều lần nhằm vào. \n\n Xem như vậy, tự mình sau đó muốn cẩn thận chút rồi. \n\n Đối với này huyết nhãn tôn kính chút... \n\n Xích Hỏa trụ phía trước. \n\n Diệp Nhiên tiếp tục bắt đầu luyện chế, trong khoảng thời gian này, mặc dù thất bại vô số lần, nhưng kinh nghiệm cũng tích lũy không thiếu. \n\n Căn cứ hắn đoán chừng, lại có nửa tháng tả hữu liền có thể đạt đến cơ sở tài nghệ. \n\n Từng khối tinh khoáng bay vào hỏa trụ bên trong, bị chậm rãi hòa tan, ẩn ẩn giao dung thành, một cây to lớn ngân mâu mô hình. \n\n \"Này tinh khoáng phẩm chất như thế nào biến thấp nhiều như vậy?\" \n\n Diệp Nhiên mi đầu hơi nhíu, so với bên trên một nhóm tinh khoáng, phẩm chất phải kém rất nhiều. \n\n Vừa mới còn không có chú ý tới, vừa bắt đầu cũng cảm giác đi ra rồi. \n\n \"Này truyền thừa quan độ khó thật đúng là không nhỏ, khó trách thời gian một năm, bọn họ còn ở lại đây cửa thứ hai.\" \n\n Nhìn một chút bốn người khác, hắn không nghĩ nhiều nữa, phải nắm chặt thời gian rồi, đoán chừng là một nhóm tinh khoáng so một nhóm tinh khoáng kém. \n\n Này mới là nhóm thứ hai, đám tiếp theo có thể phẩm chất càng kém, độ khó luyện chế cũng sẽ cao hơn. \n\n Thời gian trôi qua, lại là một tháng trôi qua. \n\n Diệp Nhiên khẽ nhả khẩu khí, thả ra trong tay cuối cùng một khối Tinh Văn Thiết, đột phá Tinh Quan về sau, luyện hóa tốc độ tăng cường không thiếu. \n\n Cho nên mặc dù là phân tâm, nhưng cũng thành công đem trên người 2 triệu 500 ngàn Tinh Văn Thiết luyện hóa. \n\n Trong đó một trăm tám mươi vạn là từ ba cái cao cấp quan hối đoái , mặt khác bảy mươi vạn, đến từ sân thi đấu bên trên, đó cái kim lệ tộc thiên tài. \n\n \"Còn kém 2 triệu 500 ngàn, liền có thể đột phá tầng hai mươi ba Tinh Nguyên Thân rồi.\" \n\n Hắn đôi mắt lấp lóe dưới, bây giờ còn có nhất trọng Tinh Nguyên Thân  ban thưởng, không dùng, dùng chính là tầng hai mươi bốn. \n\n\"Đợi Đột phá đại Tinh Quan, có lẽ có cơ hội đối với kháng Chân Vương.\" \n\n Diệp Nhiên trong lòng sinh ra một cái to gan ý niệm, bất quá tiền đề, hay là muốn có tầng thứ ba Ma Cốt Thân, hơn nữa lại học một môn cường hãn tinh thuật. \n\n Hoặc, nhận được một kiện lực công kích cực mạnh Vũ cấp kỳ vật mới có thể. \n\n Hắn bây giờ trên người kỳ vật, có chút không đủ dùng. \n\n Tiếp theo, hắn lại kiểm tra một chút thành tựu bảng, trước thành tựu sau khi hoàn thành, mới tự do thành tựu cũng xoát đi ra rồi. \n\n Hắn đã lựa chọn một cái, hơn nữa đều hoàn thành nhỏ hơn một nửa rồi. \n\n 【 Thất bại là mẹ thành công: Luyện chế tùy ý binh khí hoặc dược tề, thất bại một vạn lần, trước mắt tiến độ (7432/ lần). Ban thưởng một vạn thành tựu điểm, tam thể chất mảnh vụn. 】 \n\n Phá thần mâu, cũng thuộc về một loại đặc thù binh khí, cho nên có thể tính toán ở bên trong. \n\n \"Tinh Văn Thiết toàn bộ luyện hóa xong, bây giờ cũng có thể thông quan, thời gian lợi dụng phải vừa vặn, không có lãng phí.\" \n\n Diệp Nhiên vẫy tay một cái, cuối cùng một phần tinh quáng tài liệu, đều bay vào trong cột lửa. \n\n Hắn đã có thể luyện chế ra cấp căn bản  phá thần mâu rồi. \n\n Tinh lực tràn vào hỏa trụ bên trong, hắn chậm chạp mà cẩn thận khống chế hỏa lực, mỗi một cái luyện chế trình tự, cũng đều tự tin vô cùng. \n\n Thời gian dần dần trôi qua, lần này, so với quá khứ  luyện chế thời gian đều phải dài. \n\n Ước chừng một giờ đi qua. \n\n Theo ông một tiếng vang lên, một thanh so với phía trước, còn muốn khổng lồ mười mấy lần cực lớn ngân mâu, bỗng nhiên xông ra hỏa trụ. \n\n Ngân mâu chợt bay lên không, phần đuôi hơn vạn mét  quang diễm truyền ra the thé tiếng rít, khí thế kinh người. \n\n Trong nháy mắt, mặt khác bốn cái tuổi trẻ thiên tài kinh ngạc nhìn tới. \n\n Tiếp theo chính là âm thanh khiếp sợ vang lên. \n\n \"Vạn mét quang diễm, này là cấp căn bản  phá thần mâu!\" \n\n \"Số tám phải qua nhốt!\" \n\n \"Thật nhanh, thế mà này sao nhanh liền luyện chế thành công, này mới hai tháng mà thôi.\" \n\n \"Chúng ta ước chừng dùng nửa năm, bây giờ cũng không đạt đến cấp căn bản...\" \n\n Diệp Nhiên bàn tay vung lên, đó chuôi cực lớn ngân mâu, bá mà bay đến phía trước đó tôn xám đen cự nhân trước mặt, thẳng tắp cắm ở khắp mặt đất. \n\n Hắn đứng lên hỏi: \"Phải chăng có thể vượt qua kiểm tra rồi?\" \n\n \"Không đạt tiêu chuẩn.\" \n\n Xám đen cự nhân hờ hững âm thanh, ầm ầm ở trên bầu trời vang lên, \"Mâu đuôi ánh sáng diễm ba vạn mét, mới có thể qua ải.\" \n\n \"Ba vạn mét?\" \n\n Diệp Nhiên khẽ giật mình, \"Không phải cấp căn bản sao?\" \n\n \"Cấp căn bản chính là ba vạn mét.\" Xám đen cự nhân nói đi, chậm rãi nhắm mắt. \n\n Diệp Nhiên mi đầu hơi nhíu, đối phương yêu cầu cấp căn bản, thế mà nhào bột mì trên bảng  không nhất trí sao? \n\n Trên bảng bây giờ biểu hiện, hắn đã đạt đến cấp căn bản rồi. \n\n Bốn người khác nghe vậy, cũng là mặt lộ vẻ ngạc nhiên, tiếp theo trong mắt lóe lên mấy phần kinh dị, riêng phần mình thu hồi ánh mắt. \n\n Chỉ có ma tàu chạy đường sông chần chờ một chút, nhưng liếc một cái huyết nhãn, còn chưa lại nói tiếp. \n\n Không cần thiết bởi vì này số tám đắc tội huyết nhãn, không đáng. \n\n \"Yêu cầu thật đúng là cao.\" \n\n Diệp Nhiên lắc đầu, lại nhìn một chút bốn người khác, trong lòng hơi có vẻ kinh ngạc, nếu như không có đạt đến qua ải tiêu chuẩn, này bốn người vừa mới như thế nào cũng là đó loại phản ứng? \n\n Bất quá này bốn người bây giờ thần sắc như thường, ngược lại là nhìn không ra vấn đề gì. \n\n Hắn không có nghĩ nhiều nữa, chỉ cho là là quá quan cấp căn bản, yêu cầu tương đối cao, không phải vừa đạt đến cấp căn bản  tiêu chuẩn. \n\n Liền một lần nữa muốn  một nhóm tinh quáng tài liệu, bắt đầu luyện chế. \n\n Duy nhất đáng được ăn mừng chính là, những này tinh quáng tài liệu, cùng bên trên một nhóm giống nhau, phẩm chất không có lần nữa trở nên kém. \n\n Mặc dù vẫn là không sánh được lần thứ nhất, nhưng ngược lại là cũng còn có thể tiếp nhận. \n\n Tiếp xuống một tháng. \n\n Diệp Nhiên lấy nhanh tốc độ luyện chế, theo lần lượt thất bại, kinh nghiệm tích lũy, tiến độ cũng nước lên thì thuyền lên. \n\n Luyện chế ra phá thần mâu quang diễm, cũng tới đến mười bảy ngàn mét. \n\n \"Một vạn bảy, muốn đạt đến ba vạn, đoán chừng còn phải chừng hai tháng.\" \n\n Diệp Nhiên trong lòng trầm xuống, bây giờ không có Tinh Văn Thiết có thể luyện hóa, chậm trễ hai tháng ở đây, thực sự có chút thua thiệt. \n\n Xem ra, chỉ có thể này dạng."}];
+    let currentIndex = 0;
+    let currentFontSize = 18;
+
+    const sidebar = document.getElementById('sidebar');
+    const chapterListEl = document.getElementById('chapter-list');
+    const displayTitle = document.getElementById('display-title');
+    const displayBody = document.getElementById('display-body');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const searchInput = document.getElementById('search-input');
+
+    function renderChapterList(items) {
+      chapterListEl.innerHTML = '';
+      items.forEach((c, idx) => {
+        const li = document.createElement('li');
+        li.className = 'chapter-item' + (c.originalIndex === currentIndex ? ' active' : '');
+        li.innerHTML = `
+          <span class="chap-meta">Chương ${c.num}</span>
+          <span class="chap-title">${c.title}</span>
+        `;
+        li.onclick = () => {
+          loadChapter(c.originalIndex);
+          if (window.innerWidth <= 900) sidebar.classList.remove('open');
+        };
+        chapterListEl.appendChild(li);
+      });
+    }
+
+    function loadChapter(idx) {
+      if (idx < 0 || idx >= CHAPTERS.length) return;
+      currentIndex = idx;
+      const c = CHAPTERS[idx];
+
+      displayTitle.textContent = `Chương ${c.num}: ${c.title}`;
+      
+      // Format paragraphs
+      const paragraphs = c.content.split(/\n\n+/).filter(p => p.trim().length > 0);
+      displayBody.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
+
+      btnPrev.disabled = idx === 0;
+      btnNext.disabled = idx === CHAPTERS.length - 1;
+
+      // Update active in list
+      document.querySelectorAll('.chapter-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Toggle menu
+    document.getElementById('toggle-sidebar').onclick = () => {
+      sidebar.classList.toggle('open');
+    };
+
+    // Theme selector
+    document.querySelectorAll('[data-set-theme]').forEach(btn => {
+      btn.onclick = () => {
+        const theme = btn.getAttribute('data-set-theme');
+        document.documentElement.setAttribute('data-theme', theme);
+        document.querySelectorAll('[data-set-theme]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      };
+    });
+
+    // Font size controls
+    document.getElementById('font-inc').onclick = () => {
+      if (currentFontSize < 28) {
+        currentFontSize += 2;
+        document.body.style.fontSize = currentFontSize + 'px';
+      }
+    };
+    document.getElementById('font-dec').onclick = () => {
+      if (currentFontSize > 14) {
+        currentFontSize -= 2;
+        document.body.style.fontSize = currentFontSize + 'px';
+      }
+    };
+
+    // Navigation buttons
+    btnPrev.onclick = () => loadChapter(currentIndex - 1);
+    btnNext.onclick = () => loadChapter(currentIndex + 1);
+
+    // Search filter
+    searchInput.oninput = (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = CHAPTERS.map((c, i) => ({ ...c, originalIndex: i }))
+        .filter(c => c.num.toString().includes(q) || c.title.toLowerCase().includes(q));
+      renderChapterList(filtered);
+    };
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') loadChapter(currentIndex - 1);
+      if (e.key === 'ArrowRight') loadChapter(currentIndex + 1);
+    });
+
+    // Init
+    renderChapterList(CHAPTERS.map((c, i) => ({ ...c, originalIndex: i })));
+    loadChapter(0);
+  </script>
+</body>
+</html>
